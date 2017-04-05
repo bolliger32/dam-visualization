@@ -1,0 +1,103 @@
+/* Chart Axes */
+.axis text {
+  font-size: 0.8rem;
+  fill: rgba(129, 140, 158, 1);
+}
+
+.x-axis-grid line, .y-axis-grid line {
+  stroke: rgba(129, 140, 158, 0.15);
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.x-axis-grid path, .y-axis-grid path {
+  stroke-width: 0;
+}
+
+.axis path {
+  fill: none;
+  stroke: rgba(129, 140, 158, 0.5);
+  stroke-width: 0.2%;
+  shape-rendering: crispEdges;
+}
+
+.axis line {
+  fill: none;
+  stroke: rgba(129, 140, 158, 0.2);
+  stroke-width: 0.2%;
+}
+
+/* Slider */
+.context .handle{
+  fill: goldenrod;
+  fill-opacity: 0.8;
+}
+
+.context .brush .selection {
+  fill: #3FB8AF;
+  fill-opacity: .3;
+  shape-rendering: crispEdges;
+}
+
+
+/* Data */
+.timeseries-area .area {
+  fill: rgba(129, 140, 158, 0.15);
+  clip-path: url(#clip);
+  -webkit-clip-path: url(#clip);
+}
+
+.timeseries-line .line {
+  fill: none;
+  stroke: #aaa;
+  clip-path: url(#clip);
+  -webkit-clip-path: url(#clip);
+  stroke-width: 1;
+}
+
+rect.pane {
+  cursor: move;
+  fill: none;
+  pointer-events: all;
+}
+
+/* Annotation */
+.annotated-x-axis path {
+  stroke: rgba(129, 140, 158, 0.8);
+  stroke-width: 1;
+  fill: rgba(129, 140, 158, 0.8);
+  clip-path: url(#clip);
+  -webkit-clip-path: url(#clip);
+
+}
+
+.annotated-x-axis .tick line  {
+  fill: none;
+  stroke: rgba(129, 140, 158, 0.8);
+  stroke-width: 0.2%;
+  clip-path: url(#clip);
+  -webkit-clip-path: url(#clip);
+}
+
+.annotated-x-axis text {
+  clip-path: url(#clip);
+  -webkit-clip-path: url(#clip);
+}
+
+.annotation text {
+  font-size: 0.8em;
+  font-family: sans-serif;
+  fill: rgba(129, 140, 158, 0.8);
+}
+
+.hover-line {
+  stroke: #333;
+}
+
+/* Legend */
+.legend text {
+  font-size: 0.8rem;
+  fill: rgba(129, 140, 158, 1);
+}
+
+

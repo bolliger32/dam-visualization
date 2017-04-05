@@ -7,6 +7,7 @@
 
 library(dams)
 library(dplyr)
+library(rjson)
 
 dams <- get_nid()
 dams_bu <- dams
@@ -20,3 +21,9 @@ dams <- dams[!is.na(dams$Latitude)&!is.na(dams$Longitude),]
 
 ### SAVE AS .CSV
 write.csv(dams, file="../data/dams.csv",row.names = F)
+
+### SAVE AS GeoJSON
+damsjson <- toJSON(dams)
+plot(damsjson)
+write(damsjson, file="dams_geojson.json")
+getwd()
