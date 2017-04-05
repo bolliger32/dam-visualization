@@ -68,7 +68,7 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
   // If you're experienced with jQuery, you'll recognize we're making a GET 
   // request and expecting JSON in the response body. 
   // We're also passing in a callback function that takes the response JSON and adds it to the document.
-  $.getJSON("../assets/data/tick_locations.geojson", function(data) {
+  $.getJSON("../assets/data/dams.geojson", function(data) {
 
     // Create new L.geoJson layer with data recieved from geojson file
     // and set the tickLocations variable to new L.geoJson layer

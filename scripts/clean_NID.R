@@ -20,11 +20,19 @@ dams <- dams[!is.na(dams$Latitude)&!is.na(dams$Longitude),]
 
 ### CHANGE LAT LONG COLUMN NAMES TO MAKE MORE COMPATIBLE WITH csv-geoJson PLUGIN
 dams <- dams %>%
-  rename(lat = Latitude) %>%
-  rename(lng = Longitude)
-  
+  rename(latitude = Latitude) %>%
+  rename(longitude = Longitude)
+
+### ADD KEY 
+key <- seq(1,nrow(dams))
+dams<-cbind(key, dams)
+
+### FOR NOW JUST USE FIRST COLUMNS OF DAMS
+damstest <- dams[,c(1,3:5)]
+
 ### SAVE AS .CSV
-write.table(dams, file="../data/dams.csv",sep="|")
+write.csv(dams, file="dams.csv",row.names = F, quote=F)
+write.csv(damstest, file="damstest.csv", row.names = F, quote=F)
 
 ### SAVE AS GeoJSON
 damsjson <- toJSON(dams)
