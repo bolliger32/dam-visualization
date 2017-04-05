@@ -1,0 +1,92 @@
+<html lang="en">
+
+  <head>
+    <!-- *********************************************************************
+     Adding stylesheets to the document HEAD makes pages appear to be loading faster.
+     https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Tips_for_authoring_fast-loading_HTML_pages
+    **************************************************************************-->
+
+    <!-- Load Leaflet Stylesheet -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css" />
+
+    <!-- Load Leaflet Geocoder Stylesheet -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.5.4/Control.Geocoder.css" />
+
+    <style type="text/css">
+      .container {
+        text-align: center;
+      }
+      #map {
+        border: 2px solid #333;
+        height: 600px;
+        width: 800px;
+        margin: 2em auto;
+      }
+    </style>
+  </head>
+
+  <body>
+  
+  <main role="main">
+    <section class="container">
+      <h2>06 - Spatial Analysis in your Browser</h2>
+      
+      <!-- Map panel -->
+      <div id="map"></div>
+
+      <div class="info" style="height: 4em;">Hover over a county</div>
+      <a href="../index.html">Back to Working</a>
+    </section>
+  </main>
+
+    <!-- *********************************************************************
+     Putting Javascript files towards bottom of the body is a standard recommendation 
+     for speeding up the apparent load time of your page
+     https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Tips_for_authoring_fast-loading_HTML_pages
+    **************************************************************************-->
+    <!-- Load jquery from CDN -->
+    <script   src="//code.jquery.com/jquery-2.2.1.js"   integrity="sha256-eNcUzO3jsv0XlJLveFEkbB8bA7/CroNpNVk3XpmnwHc="   crossorigin="anonymous"></script>
+    
+    <!-- Load Leaflet Javascript -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js"></script>
+
+    <!-- Load TopoJSON from CDN -->
+    <!-- TopoJSON is an extension of GeoJSON that encodes topology -->
+    <!-- https://github.com/mbostock/topojson/wiki -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.20/topojson.js"></script>
+
+    <!-- Javascript code for extending Leaflet's L.geoJson layer to read topojson files -->
+    <script>
+      // Copyright (c) 2013 Ryan Clark
+      // https://gist.github.com/rclark/5779673
+      L.TopoJSON = L.GeoJSON.extend({
+        addData: function(jsonData) {    
+          if (jsonData.type === "Topology") {
+            for (key in jsonData.objects) {
+              geojson = topojson.feature(jsonData, jsonData.objects[key]);
+              L.GeoJSON.prototype.addData.call(this, geojson);
+            }
+          }    
+          else {
+            L.GeoJSON.prototype.addData.call(this, jsonData);
+          }
+        }  
+      });
+    </script>
+
+    <!-- Load chroma.js from CDN -->
+    <!-- JavaScript library for all kinds of color manipulations -->
+    <!-- http://gka.github.io/chroma.js/ -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/chroma-js/0.5.9/chroma.min.js"></script>
+
+    <!-- Load Leaflet Geocoder Javascript -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.5.4/Control.Geocoder.js"></script>
+
+     <!-- Load Turf Javascript -->
+    <script src="../../../assets/lib/turf.min.js"></script>
+
+    <!-- Javascript code for your app goes in between script tags below -->
+    <script src="solution.js"></script>
+
+  </body>
+</html>
