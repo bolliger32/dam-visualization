@@ -91,12 +91,12 @@ body {
   margin-bottom: 0.7em;
 }
 
-.map-legend li.ticks-layer {
+.map-legend li.dams-layer {
   display: flex;
   align-items: center;
 }
 
-.tick-symbol {
+.dams-symbol {
   background: #DE7A22;
   border: 1px solid #C56109;
   height:10px;

@@ -71,7 +71,7 @@ rect.pane {
 
 }
 
-.annotated-x-axis .tick line  {
+.annotated-x-axis .dams line  {
   fill: none;
   stroke: rgba(129, 140, 158, 0.8);
   stroke-width: 0.2%;

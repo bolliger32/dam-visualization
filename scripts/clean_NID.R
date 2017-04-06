@@ -18,24 +18,21 @@ dams <- dams %>%
 ### THROW OUT ROWS WITH N/A LAT OR LONG
 dams <- dams[!is.na(dams$Latitude)&!is.na(dams$Longitude),]
 
+### DEFINE FUNCTION TO REPLACE EMPTY CELLS WITH NA
+empty_as_na <- function(x){
+  if("factor" %in% class(x)) x <- as.character(x) ## since ifelse wont work with factors
+  ifelse(as.character(x)!="", x, NA)
+}
+
 ### CHANGE LAT LONG COLUMN NAMES TO MAKE MORE COMPATIBLE WITH csv-geoJson PLUGIN
 dams <- dams %>%
   rename(latitude = Latitude) %>%
-  rename(longitude = Longitude)
+  rename(longitude = Longitude) %>%
+  mutate_each(funs(empty_as_na)) 
 
 ### ADD KEY 
 key <- seq(1,nrow(dams))
 dams<-cbind(key, dams)
 
-### FOR NOW JUST USE FIRST COLUMNS OF DAMS
-damstest <- dams[,c(1,3:5)]
-
 ### SAVE AS .CSV
-write.csv(dams, file="dams.csv",row.names = F, quote=F)
-write.csv(damstest, file="damstest.csv", row.names = F, quote=F)
-
-### SAVE AS GeoJSON
-damsjson <- toJSON(dams)
-plot(damsjson)
-write(damsjson, file="dams_geojson.json")
-getwd()
+write.csv(dams, file="../data/dams.csv",row.names = F)
