@@ -34,11 +34,11 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 
 
   /********************************************************************************
-    ADD TICK LOCATIONS
+    ADD DAM LOCATIONS
   ********************************************************************************/
   
   // Intialize a variable to holda Leaflet geoJson layer
-  var tickLocations;
+  var damLocations;
 
   // Create object to hold options for styling a custom marker
   var geojsonMarkerOptions = {
@@ -68,22 +68,22 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
   // If you're experienced with jQuery, you'll recognize we're making a GET 
   // request and expecting JSON in the response body. 
   // We're also passing in a callback function that takes the response JSON and adds it to the document.
-  $.getJSON("../assets/data/tick_locations.geojson", function(data) {
+  $.getJSON("../assets/data/dams.geojson", function(data) {
 
     // Create new L.geoJson layer with data recieved from geojson file
-    // and set the tickLocations variable to new L.geoJson layer
-    tickLocations = L.geoJson(data, {
+    // and set the damLocations variable to new L.geoJson layer
+    damLocations = L.geoJson(data, {
       pointToLayer: createMarker,
       onEachFeature: bindPopup
     });
 
-    // Add tick locations to map
-    tickLocations.addTo(map);
+    // Add dam locations to map
+    damLocations.addTo(map);
 
-    // Add tick locations layer as an overlay to layer control
+    // Add dam locations layer as an overlay to layer control
     // Note: $.getJSON method is asynchronous. Although we intialize layerControl later in the code
     // it should already exists by the time this code runs. 
-    layerControl.addOverlay(tickLocations, "Tick Collection Locations");
+    layerControl.addOverlay(damLocations, "Dam Locations");
 
 
     /********************************************************************************
@@ -91,16 +91,16 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
     ********************************************************************************/
     // This functionaility is provided by Leaflet Marker Cluster ibrary
     var clusteredMarkers = L.markerClusterGroup();
-    clusteredMarkers.addLayer(tickLocations);
-    layerControl.addOverlay(clusteredMarkers, "Tick Collection Locations (Clustered)");
+    clusteredMarkers.addLayer(damLocations);
+    layerControl.addOverlay(clusteredMarkers, "Dam Locations (Clustered)");
 
 
     /********************************************************************************
-      ADD 10 MILE BUFFER AROUND TICK LOCATIONS 
+      ADD 10 MILE BUFFER AROUND DAM LOCATIONS 
     ********************************************************************************/
     var bufferFeatureCollection = turf.buffer(data, 10, 'miles');
     var buffersLayer = L.geoJson(bufferFeatureCollection);
-    layerControl.addOverlay(buffersLayer, "10 Mile Buffers around Tick Collection Locations");
+    layerControl.addOverlay(buffersLayer, "10 Mile Buffers around Dam Locations");
   
 
   });
@@ -117,7 +117,7 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
   var layerControl = L.control.layers(null, null, { position: 'bottomleft' }).addTo(map);
 
   // Add basemap defined earlier to layer control
-  layerControl.addBaseLayer(Esri_WorldImagery, "Grayscale");
+  layerControl.addBaseLayer(Esri_WorldImagery, "Imagery");
 
 
   /********************************************************************************
@@ -194,38 +194,6 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
       $('body').append('<p>Oh no, something went wrong with the county layer!</p>');
   });
 
-
-  function addCountyData(topoData){
-
-    // This is calling the addData method of the new L.TopoJSON layer we defined earlier
-    countyLayer.addData(topoData);
-    
-    // This is calling the addTo method of Leaflet's L.layerGroup
-    countyLayer.addTo(map);
-
-    // This is calling the eachLayer method of Leaflet's L.layerGroup
-    // Note: L.TopoJSON extends L.GeoJSON extends L.FeatureGroup extends L.layerGroup
-    // It iterates over the layers of the group and calls function addToDomain that we define below
-    countyLayer.eachLayer(addToDomain);
-
-    // Calculate quantile breaks for color scale
-    calcQuantileBreaks();
-
-    // Add legend
-    addLegend();
-
-    // For each layer it call function handleLayer that we define below
-    countyLayer.eachLayer(handleLayer);
-
-    // Move data behind tick locations
-    countyLayer.bringToBack();
-
-    // Add overlay to layer control
-    layerControl.addOverlay(countyLayer, "CA Counties");
-
-    // Create county d3 charts
-    createPolygonViz(topoData);
-  }
 
 
   // Add population density values to color scale
@@ -304,18 +272,8 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
     /********************************************************************************
     SPATIAL ANALYSIS IN YOUR BROWSER
     ********************************************************************************/
-
-    // Many turf functions expect a featurecollection. 
-    // Use turf's featurecollection helper method to convert our geojson feature into a
-    // featurecollection
-    var countyGeojson = turf.featureCollection([county]);
-
-    // Count number of tick locations within county
-    var ptsWithin = turf.within(tickLocations.toGeoJSON(), countyGeojson);
-    var count = ptsWithin.features.length;
-
     // Add count to html string
-    html = html + '<br/>' + count + ' tick collection locations';
+    html = html + '<br/>' + count + ' dam collection locations';
 
     // Append html string to p element with .info class
     $('.info').html(html);

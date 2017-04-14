@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
 
-    <title>Dams in California</title>
+    <title>Dams in the United States</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <meta name="description" content="web mapping with leaflet and d3 session">
-    <meta name="author" content="@BerkeleyGIF">
+    <meta name="author" content="@DS421">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="HandheldFriendly" content="True">
@@ -20,7 +20,7 @@
      Loading Google fonts
     **************************************************************************-->
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,400,400i' rel='stylesheet' type='text/css'>
-
+	<link href='https://api.mapbox.com/mapbox-gl-js/v0.34.0/mapbox-gl.css' rel='stylesheet' />
 
     <!-- *********************************************************************
      Adding stylesheets to the document HEAD makes pages appear to be loading faster.
@@ -51,7 +51,7 @@
 
         <!-- Project description -->
         <div class="content">
-          <h1>Dams in California</h1>
+          <h1>Dams in the United States</h1>
           <p>
             Descriptive text.
           </p>
@@ -59,8 +59,8 @@
             Dams are fun.
           </p>
           <ul class="map-legend">
-            <li class="ticks-layer">
-              <span class="tick-symbol"></span>Dam Locations
+            <li class="dams-layer">
+              <span class="dam-symbol"></span>Dam Locations
             </li>
             <li>
               <span class="info">Hover over a dam</span>
@@ -130,11 +130,15 @@
     <!-- Load D3 from CDN -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/d3/4.7.3/d3.min.js"></script>
     <script src="https://d3js.org/topojson.v1.min.js"></script>
+	
+	<!-- Load Omnivore plugin to use csv files -->
+	<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
 
     <!-- Javascript code for your app goes in between script tags below -->
     <script src="bar_chart.js"></script>
     <script src="draw_polygon.js"></script>
     <script src="index.js"></script>
+	
 
   </body>
 </html>
