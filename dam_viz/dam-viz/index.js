@@ -71,7 +71,7 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
   // request and expecting JSON in the response body. 
   // We're also passing in a callback function that takes the response JSON and adds it to the document.
   function addDams(filterFunc) {
-    $.getJSON("../assets/data/dams_small.geojson", function(data) {
+    $.getJSON("../assets/data/dams_CA.geojson", function(data) {
 
     // Create new L.geoJson layer with data recieved from geojson file
     // and set the damLocations variable to new L.geoJson layer
