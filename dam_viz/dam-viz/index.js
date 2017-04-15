@@ -57,10 +57,11 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 
   // Create a function to generate popup content
   function bindPopup(feature, layer) {
-    var popupText = feature.properties.Location;
-    if (feature.Specific_Location_Information != undefined) {
-      popupText = popupText + " (" + feature.specific_location_information + ")";
-    }
+    var popupText = "Dam Name: " + feature.properties.Dam_Name + " \
+					Dam Height: " + feature.properties.NID_Height;
+//    if (feature.Specific_Location_Information != undefined) {
+//      popupText = popupText + " (" + feature.specific_location_information + ")";
+//    }
     layer.bindPopup(popupText);
   }
 
