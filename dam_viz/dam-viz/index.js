@@ -1,4 +1,3 @@
-//SCRIPT FOR MY SANDBOX VERSION
 
 (function(){
 
@@ -44,8 +43,8 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
   // Create object to hold options for styling a custom marker
   var geojsonMarkerOptions = {
     radius: 4,
-    fillColor: "#DE7A22",
-    color: "#C56109",
+    fillColor: "#fdae6b",
+    color: "#e6550d",
     weight: 1,
     opacity: 1,
     fillOpacity: 0.5
@@ -78,12 +77,12 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
     if (typeof filterFunc === "undefined") {
       damLocations = L.geoJson(data, {
         pointToLayer: createMarker,
-        onEachFeature: bindPopup
+        onEachFeature: onEachFeature
       });
     } else {
       damLocations = L.geoJson(data, {
         pointToLayer: createMarker,
-        onEachFeature: bindPopup,
+        onEachFeature: onEachFeature,
         filter: filterFunc
       });
     }
@@ -153,5 +152,59 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 	};
 	map.addControl(filterBar);
 
+  /********************************************************************************
+    Add table - http://leafletjs.com/examples/choropleth/
+  ********************************************************************************/
+	var info = L.control();
 
+	info.onAdd = function (map) {
+		this._div = L.DomUtil.create('div', 'info');
+		this.update();
+		return this._div;
+	};
+
+	info.update = function (props) {
+		this._div.innerHTML = this._div.innerHTML + (props ?
+			'<b>' + props.Dam_Type + ' dam' +'</b>' +  '<br />' +  props.Dam_Name +  '<br />' 
+			: '');
+	};
+
+	info.addTo(map);
+	
+	function highlightFeature(e) {
+		var layer = e.target;
+
+		layer.setStyle({
+			weight: 2,
+			color: '#a63603',
+			dashArray: '',
+			fillOpacity: 0.7
+		});
+
+		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+			layer.bringToFront();
+		}
+
+	}
+	
+	function updateInfo(e) {
+		var layer = e.target;	
+		info.update(layer.feature.properties);
+	}
+
+	function resetHighlight(e) {
+		damLocations.resetStyle(e.target);
+	}
+
+
+	function onEachFeature(feature, layer) {
+		layer.on({
+			click: updateInfo,
+			mouseover: highlightFeature,
+			mouseout: resetHighlight
+		});
+	}
+
+	
 })();
+
