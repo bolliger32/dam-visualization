@@ -165,14 +165,20 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 	};
 	
 	var table = document.createElement('table');
-	var theader = document.createElement('th');
+	var theader1 = document.createElement('th');
+	var theader2 = document.createElement('th');
+	var theader3 = document.createElement('th');
+	var trH = document.createElement('tr');
 	var headertext1 = document.createTextNode('Dam Name');
 	var headertext2 = document.createTextNode('   Dam Type');
 	var headertext3 = document.createTextNode('   Dam Height');
-	theader.appendChild(headertext1);
-	theader.appendChild(headertext2);
-	theader.appendChild(headertext3);
-	table.appendChild(theader);
+	theader1.appendChild(headertext1);
+	theader2.appendChild(headertext2);
+	theader3.appendChild(headertext3);
+	trH.appendChild(theader1);
+	trH.appendChild(theader2);
+	trH.appendChild(theader3);
+	table.appendChild(trH);
 
 	info.update = function (props) {
 
@@ -199,7 +205,7 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 
 
 		this._div.appendChild(table);
-		console.log(text3);
+		console.log(table);
 		
 
 	};
