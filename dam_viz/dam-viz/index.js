@@ -42,12 +42,12 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 
   // Create object to hold options for styling a custom marker
   var geojsonMarkerOptions = {
-    radius: 4,
+    radius: 7,
     fillColor: "#fdae6b",
     color: "#e6550d",
     weight: 1,
     opacity: 1,
-    fillOpacity: 0.5
+    fillOpacity: 0.8
   };
 
   // Create a function to create a custom marker
@@ -154,19 +154,34 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 
   /********************************************************************************
     Add table - http://leafletjs.com/examples/choropleth/
-  ********************************************************************************/
-	var info = L.control();
+  ********************************************************************************/	
+	
+	var info = L.control({position: 'bottomright'});
 
 	info.onAdd = function (map) {
-		this._div = L.DomUtil.create('div', 'info');
+		this._div = L.DomUtil.create('div', 'info'); 
 		this.update();
 		return this._div;
 	};
+	
+	var table = document.createElement('table');
+	var theader = document.createElement('th');
+	var headertext = document.createTextNode('damtype');theader.appendChild(headertext);table.appendChild(theader);
 
 	info.update = function (props) {
-		this._div.innerHTML = this._div.innerHTML + (props ?
-			'<b>' + props.Dam_Type + ' dam' +'</b>' +  '<br />' +  props.Dam_Name +  '<br />' 
-			: '');
+
+		var tr = document.createElement('tr');
+		var td = document.createElement('td');
+		var text = document.createTextNode(props ? props.Dam_Type : '');
+		td.appendChild(text);
+		tr.appendChild(td);
+		table.appendChild(tr);
+		//'<h4>' + 'Dam Comparison' + '</h4>'
+		//this._div.innerHTML = props ? this._div.innerHTML + table : '' ;
+		this._div.appendChild(table);
+		console.log(table);
+		
+
 	};
 
 	info.addTo(map);
@@ -177,8 +192,9 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 		layer.setStyle({
 			weight: 2,
 			color: '#a63603',
+			fillColor: '#e6550d',
 			dashArray: '',
-			fillOpacity: 0.7
+			fillOpacity: 0.9
 		});
 
 		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
