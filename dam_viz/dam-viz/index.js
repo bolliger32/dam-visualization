@@ -170,8 +170,8 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 	var theader3 = document.createElement('th');
 	var trH = document.createElement('tr');
 	var headertext1 = document.createTextNode('Dam Name');
-	var headertext2 = document.createTextNode('   Dam Type');
-	var headertext3 = document.createTextNode('   Dam Height');
+	var headertext2 = document.createTextNode('Type');
+	var headertext3 = document.createTextNode('Height');
 	theader1.appendChild(headertext1);
 	theader2.appendChild(headertext2);
 	theader3.appendChild(headertext3);
@@ -212,16 +212,8 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 
 	info.addTo(map);
 	
-	function highlightFeature(e) {
+	function bringToFront(e) {
 		var layer = e.target;
-
-		layer.setStyle({
-			weight: 2,
-			color: '#a63603',
-			fillColor: '#e6550d',
-			dashArray: '',
-			fillOpacity: 0.9
-		});
 
 		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
 			layer.bringToFront();
@@ -232,18 +224,31 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 	function updateInfo(e) {
 		var layer = e.target;	
 		info.update(layer.feature.properties);
+		layer.setStyle({
+			weight: 2,
+			color: '#a63603',
+			fillColor: '#e6550d',
+			dashArray: '',
+			fillOpacity: 0.9
+		});
+
+		
 	}
 
-	function resetHighlight(e) {
-		damLocations.resetStyle(e.target);
-	}
+//	function selectFeature(e) {
+//		var layer = e.target;
+//	}
+	
+	//function resetHighlight(e) {
+		//damLocations.resetStyle(e.target);
+	//}
 
-
+	
 	function onEachFeature(feature, layer) {
 		layer.on({
 			click: updateInfo,
-			mouseover: highlightFeature,
-			mouseout: resetHighlight
+			mouseover: bringToFront,
+			//mouseout: resetHighlight
 		});
 	}
 
