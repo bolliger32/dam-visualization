@@ -166,20 +166,40 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 	
 	var table = document.createElement('table');
 	var theader = document.createElement('th');
-	var headertext = document.createTextNode('damtype');theader.appendChild(headertext);table.appendChild(theader);
+	var headertext1 = document.createTextNode('Dam Name');
+	var headertext2 = document.createTextNode('   Dam Type');
+	var headertext3 = document.createTextNode('   Dam Height');
+	theader.appendChild(headertext1);
+	theader.appendChild(headertext2);
+	theader.appendChild(headertext3);
+	table.appendChild(theader);
 
 	info.update = function (props) {
 
-		var tr = document.createElement('tr');
-		var td = document.createElement('td');
-		var text = document.createTextNode(props ? props.Dam_Type : '');
-		td.appendChild(text);
-		tr.appendChild(td);
-		table.appendChild(tr);
-		//'<h4>' + 'Dam Comparison' + '</h4>'
-		//this._div.innerHTML = props ? this._div.innerHTML + table : '' ;
+		var tr1 = document.createElement('tr');
+		var td1 = document.createElement('td');
+		var text1 = document.createTextNode(props ? props.Dam_Name : '');
+		
+		var td2 = document.createElement('td');
+		var text2 = document.createTextNode(props ? ' ' + props.Dam_Type + ' ': '');
+		
+		var td3 = document.createElement('td');
+		var text3 = document.createTextNode(props ? ' ' + props.Dam_Height + ' ' : '');
+		
+		
+		td1.appendChild(text1);
+		tr1.appendChild(td1);
+		table.appendChild(tr1);	
+		
+		td2.appendChild(text2);
+		tr1.appendChild(td2);
+
+		td3.appendChild(text3);
+		tr1.appendChild(td3);
+
+
 		this._div.appendChild(table);
-		console.log(table);
+		console.log(text3);
 		
 
 	};

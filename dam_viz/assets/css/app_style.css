@@ -29,10 +29,23 @@ blockquote:before, blockquote:after, q:before, q:after {
   content: none;
 }
 
+
 table {
-  border-collapse: collapse;
-  border-spacing: 0;
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
 }
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
 
 body {
   -webkit-text-size-adjust: none;
