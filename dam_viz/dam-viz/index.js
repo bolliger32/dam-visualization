@@ -1,6 +1,5 @@
 
 (function(){
-
   /********************************************************************************
     INITIALIZE MAP
   ********************************************************************************/
@@ -50,22 +49,16 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
     fillOpacity: 0.8
   };
 
+	
+
   // Create a function to create a custom marker
   function createMarker(feature, latlng) {
-    return L.circleMarker(latlng, geojsonMarkerOptions);
+	  
+    return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(feature.properties.Dam_Name);
+	       // .openPopup();
   }
 
-  // Create a function to generate popup content
-  function bindPopup(feature, layer) {
-	  var popupcontent = [];
-		for (var prop in feature.properties) {
-			popupcontent.push("<td>" + prop + "</td><td>" + feature.properties[prop] + "</td>");
-		}
-	  var popupTable = "<div><table><tr>" + popupcontent.join("</tr>") + "</div></table>"
-		layer.bindPopup(popupTable);
-  }
-
-  // Use ajax call to get data. After data comes back apply styles and bind popup
+	// Use ajax call to get data. After data comes back apply styles and bind popup
   // If you're experienced with jQuery, you'll recognize we're making a GET 
   // request and expecting JSON in the response body. 
   // We're also passing in a callback function that takes the response JSON and adds it to the document.
@@ -97,7 +90,7 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
     /********************************************************************************
       ADD MARKER CLUSTER LAYER
     ********************************************************************************/
-    // This functionaility is provided by Leaflet Marker Cluster ibrary
+    // This functionaility is provided by Leaflet Marker Cluster Library
     clusteredMarkers = L.markerClusterGroup();
     clusteredMarkers.addLayer(damLocations);
     layerControl.addOverlay(clusteredMarkers, "Dam Locations (Clustered)");
@@ -205,7 +198,6 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 
 
 		this._div.appendChild(table);
-		console.log(table);
 		
 
 	};
@@ -230,28 +222,16 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 			fillColor: '#e6550d',
 			dashArray: '',
 			fillOpacity: 0.9
-		});
-
-		
+		});		
 	}
 
-//	function selectFeature(e) {
-//		var layer = e.target;
-//	}
-	
-	//function resetHighlight(e) {
-		//damLocations.resetStyle(e.target);
-	//}
 
-	
 	function onEachFeature(feature, layer) {
 		layer.on({
 			click: updateInfo,
-			mouseover: bringToFront,
-			//mouseout: resetHighlight
+			mouseover: bringToFront
 		});
 	}
 
-	
 })();
 
