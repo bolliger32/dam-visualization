@@ -53,9 +53,9 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 
   // Create a function to create a custom marker
   function createMarker(feature, latlng) {
-	  
-    return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(feature.properties.Dam_Name);
-	       // .openPopup();
+	  var newpopup = L.popup({ closeOnClick: false, autoClose: false }).setContent(feature.properties.Dam_Name);
+	  console.log(newpopup);
+    return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(newpopup);
   }
 
 	// Use ajax call to get data. After data comes back apply styles and bind popup
