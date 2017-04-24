@@ -66,7 +66,28 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
     return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(newpopup);
   }
 
-	// Use ajax call to get data. After data comes back apply styles and bind popup
+  // Create a function to generate popup content
+  function bindPopup(feature, layer) {
+	  var popupcontent = [];
+		for (var prop in feature.properties) {
+			popupcontent.push("<td>" + prop + "</td><td>" + feature.properties[prop] + "</td>");
+		}
+	  var popupTable = "<div><table><tr>" + popupcontent.join("</tr>") + "</div></table>"
+		layer.bindPopup(popupTable);
+  }
+
+  // Get variables and values JSON for use later on in filter creation
+  var filterJSON = (function () {
+    var filterJSON = null;
+    $.ajax({
+        'url':"../assets/data/filterText.json",
+        'success': function(data) {filterJSON=data},
+        'async': false,
+        'global': false,
+        'dataType': "json"});
+    return filterJSON; })();
+  
+  // Use ajax call to get data. After data comes back apply styles and bind popup
   // If you're experienced with jQuery, you'll recognize we're making a GET 
   // request and expecting JSON in the response body. 
   // We're also passing in a callback function that takes the response JSON and adds it to the document.
@@ -144,13 +165,30 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
     }
   }
   
+  function switchAvailValues(selector,varName) {
+    $(selector).empty();
+    for(index in filterJSON['vals'][varName]) {
+      selector.options[selector.options.length] = new Option(filterJSON['vals'][varName][index], filterJSON['vals'][varName][index]);
+    }
+  }
+  
+  
   var filterBar = L.control({position: 'topright'});
 	filterBar.onAdd = function () {
+//    var var_selector_div = L.DomUtil.create('div', 'info legend');
+//    var_selector_div.innerHTML = '<select><option>Test</select></option>';
 		var div = L.DomUtil.create('div', 'info legend');
-		div.innerHTML = '<select><option value="reset">Dam Type</option><option value="Rockfill">Rockfill</option><option value="Earth">Earth</option><option value="Multi-Arch">Multi-Arch</option><option value="Timber Crib">Timber Crib</option><option value="RCC">RCC</option><option value="Masonry">Masonry</option><option value="Stone">Stone</option><option value="Concrete">Concrete</option><option value="Gravity">Gravity</option><option value="Arch">Arch</option><option value="Buttress">Buttress</option><option value="Other">Other</option></select>';
-    var selector = div.firstChild;
-		selector.onchange = function () {applyFilter(selector.value)};
-    selector.onmousedown = selector.ondblclick = L.DomEvent.stopPropagation;
+		div.innerHTML = '<select id="varSel"><option value=null>Select Variable:</option></select><select id="valSel"></select>';
+    var varSel = div.firstChild;
+    var valSel = div.childNodes[1];
+    for(index in filterJSON['types']) {
+      varSel.options[varSel.options.length] = new Option(index, index)
+    }
+    varSel.onchange = function() {switchAvailValues(valSel,varSel.value)};
+      
+//    div.innerHTML = '<select><option value="reset">Dam Type</option><option value="Rockfill">Rockfill</option><option value="Earth">Earth</option><option value="Multi-Arch">Multi-Arch</option><option value="Timber Crib">Timber Crib</option><option value="RCC">RCC</option><option value="Masonry">Masonry</option><option value="Stone">Stone</option><option value="Concrete">Concrete</option><option value="Gravity">Gravity</option><option value="Arch">Arch</option><option value="Buttress">Buttress</option><option value="Other">Other</option></select>';
+//		selector.onchange = function () {applyFilter(selector.value)};
+//    selector.onmousedown = selector.ondblclick = L.DomEvent.stopPropagation;
 		return div;
 	};
 	map.addControl(filterBar);
