@@ -154,6 +154,20 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
 		return div;
 	};
 	map.addControl(filterBar);
+	
+map.on('zoomend', function(){
+    var z = map.getZoom();
+
+    if (z > 8) {
+        return damLocations.addTo(map);
+		return clusteredMarkers.removeFrom(map);
+    }
+    if (z < 8) {
+        return damLocations.removeFrom(map);
+	}	
+});
+
+
 
   /********************************************************************************
     Add table - http://leafletjs.com/examples/choropleth/
@@ -174,16 +188,44 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
 	var theader1 = document.createElement('th');
 	var theader2 = document.createElement('th');
 	var theader3 = document.createElement('th');
+	var theader4 = document.createElement('th');
+	var theader5 = document.createElement('th');
+	var theader6 = document.createElement('th');
+	var theader7 = document.createElement('th');
+	var theader8 = document.createElement('th');
+	var theader9 = document.createElement('th');
+	var theader10 = document.createElement('th');
 	var trH = document.createElement('tr');
 	var headertext1 = document.createTextNode('Dam Name');
 	var headertext2 = document.createTextNode('Type');
-	var headertext3 = document.createTextNode('Height');
+	var headertext3 = document.createTextNode('Height (ft)');
+	var headertext4 = document.createTextNode('River');
+	var headertext5 = document.createTextNode('Primary Purpose');
+	var headertext6 = document.createTextNode('Max Discharge');
+	var headertext7 = document.createTextNode('Storage');
+	var headertext8 = document.createTextNode('Drainage Area');
+	var headertext9 = document.createTextNode('Reg Agency');
+	var headertext10 = document.createTextNode('Owner');
 	theader1.appendChild(headertext1);
 	theader2.appendChild(headertext2);
 	theader3.appendChild(headertext3);
+	theader4.appendChild(headertext4);
+	theader5.appendChild(headertext5);
+	theader6.appendChild(headertext6);
+	theader7.appendChild(headertext7);
+	theader8.appendChild(headertext8);
+	theader9.appendChild(headertext9);
+	theader10.appendChild(headertext10);
 	trH.appendChild(theader1);
 	trH.appendChild(theader2);
 	trH.appendChild(theader3);
+	trH.appendChild(theader4);
+	trH.appendChild(theader5);
+	trH.appendChild(theader6);
+	trH.appendChild(theader7);
+	trH.appendChild(theader8);
+	trH.appendChild(theader9);
+	trH.appendChild(theader10);
 	table.appendChild(trH);
 
 	info.update = function (props) {
@@ -196,8 +238,28 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
 		var text2 = document.createTextNode(props ? ' ' + props.Dam_Type + ' ': '');
 		
 		var td3 = document.createElement('td');
-		var text3 = document.createTextNode(props ? ' ' + props.Dam_Height + ' ' : '');
+		var text3 = document.createTextNode(props ? ' ' + props.Hydraulic_Height + ' ' : '');
 		
+		var td4 = document.createElement('td');
+		var text4 = document.createTextNode(props ? ' ' + props.River + ' ' : '');
+		
+		var td5 = document.createElement('td');
+		var text5 = document.createTextNode(props ? ' ' + props.Primary_Purpose + ' ' : '');
+		
+		var td6 = document.createElement('td');
+		var text6 = document.createTextNode(props ? ' ' + props.Max_Discharge + ' ' : '');
+		
+		var td7 = document.createElement('td');
+		var text7 = document.createTextNode(props ? ' ' + props.NID_Storage + ' ' : '');
+		
+		var td8 = document.createElement('td');
+		var text8 = document.createTextNode(props ? ' ' + props.Drainage_Area + ' ' : '');
+		
+		var td9 = document.createElement('td');
+		var text9 = document.createTextNode(props ? ' ' + props.State_Reg_Agency + ' ' : '');
+		
+		var td10 = document.createElement('td');
+		var text10 = document.createTextNode(props ? ' ' + props.Owner_Name + ' ' : '');
 		
 		td1.appendChild(text1);
 		tr1.appendChild(td1);
@@ -207,8 +269,21 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
 		tr1.appendChild(td2);
 
 		td3.appendChild(text3);
+		td4.appendChild(text4);
+		td5.appendChild(text5);
+		td6.appendChild(text6);
+		td7.appendChild(text7);
+		td8.appendChild(text8);
+		td9.appendChild(text9);
+		td10.appendChild(text10);
 		tr1.appendChild(td3);
-
+		tr1.appendChild(td4);
+		tr1.appendChild(td5);
+		tr1.appendChild(td6);
+		tr1.appendChild(td7);
+		tr1.appendChild(td8);
+		tr1.appendChild(td9);
+		tr1.appendChild(td10);
 
 		this._div.appendChild(table);
 		
