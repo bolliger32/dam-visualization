@@ -9,7 +9,7 @@
 	center: [38, -120.5],
     zoom: 6,
     minZoom: 1,
-    maxZoom: 10,
+    maxZoom: 16,
     attributionControl: true,
     touchZoom: false,
     scrollWheelZoom: false
