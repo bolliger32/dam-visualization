@@ -33,19 +33,28 @@ blockquote:before, blockquote:after, q:before, q:after {
 table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
+	text-align: center;
     width: 100%;
 }
 
 td {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 5px;
+    border: 3px solid #636363;
+    text-align: center;
+    padding: 3px;
 }
 
 th {
-	border: 1px solid #dddddd;
-	text-align: left;
-	padding:1px;
+	border: 3px solid #636363;
+	text-align: center;
+	padding:3px;
+}
+
+.leaflet-popup-content-wrapper {
+	border: 3px solid #636363;
+	padding:0px;
+	font-family: 'Droid Serif';
+    border-collapse: collapse;
+	text-align: center;
 }
 
 tr:nth-child(odd) {
