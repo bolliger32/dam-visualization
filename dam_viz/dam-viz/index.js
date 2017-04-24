@@ -54,7 +54,6 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
   // Create a function to create a custom marker
   function createMarker(feature, latlng) {
 	  var newpopup = L.popup({ closeOnClick: false, autoClose: false }).setContent(feature.properties.Dam_Name);
-	  console.log(newpopup);
     return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(newpopup);
   }
 
@@ -107,7 +106,7 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
   ********************************************************************************/
 
   // Create a new Leaflet layer control
-  var layerControl = L.control.layers(null, null, { position: 'bottomleft' }).addTo(map);
+  var layerControl = L.control.layers(null, null, { position: 'bottomleft', }).addTo(map);
 
   // Add basemap defined earlier to layer control
   layerControl.addBaseLayer(Esri_WorldImagery, "Imagery");
@@ -149,13 +148,16 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
     Add table - http://leafletjs.com/examples/choropleth/
   ********************************************************************************/	
 	
-	var info = L.control({position: 'bottomright'});
+	var info = L.control({
+		position: 'bottomright',
+		});
 
 	info.onAdd = function (map) {
 		this._div = L.DomUtil.create('div', 'info'); 
 		this.update();
 		return this._div;
-	};
+	}
+
 	
 	var table = document.createElement('table');
 	var theader1 = document.createElement('th');
@@ -232,6 +234,19 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 			mouseover: bringToFront
 		});
 	}
+
+function onMapClick(e) {
+   
+   var table2 = document.createElement('table2');
+	table2.appendChild(trH);
+	table=table2;
+   info._div.innerHTML='';  
+   map.eachLayer(function (layer) { 
+   layer.closePopup()});
+   console.log(table2)
+}
+
+map.on('click', onMapClick);	
 
 })();
 
