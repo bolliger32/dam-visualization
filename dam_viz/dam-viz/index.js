@@ -236,14 +236,20 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 	}
 
 function onMapClick(e) {
-   
-   var table2 = document.createElement('table2');
+   	var table2 = document.createElement('table');
 	table2.appendChild(trH);
 	table=table2;
    info._div.innerHTML='';  
    map.eachLayer(function (layer) { 
    layer.closePopup()});
-   console.log(table2)
+   damLocations.setStyle({
+    radius: 7,
+    fillColor: "#fdae6b",
+    color: "#e6550d",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+		});
 }
 
 map.on('click', onMapClick);	
