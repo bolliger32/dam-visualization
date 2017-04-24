@@ -1,5 +1,6 @@
 
 (function(){
+
   /********************************************************************************
     INITIALIZE MAP
   ********************************************************************************/
@@ -23,6 +24,15 @@
 
   //Initialize a new Leaflet layer
 var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
+var Topo_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
+var ImageryTopo_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryTopo/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
+var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSHydroNHD/MapServer/tile/{z}/{y}/{x}', {
   attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
 
@@ -49,15 +59,22 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
     fillOpacity: 0.8
   };
 
-	
-
   // Create a function to create a custom marker
   function createMarker(feature, latlng) {
-	  var newpopup = L.popup({ closeOnClick: false, autoClose: false }).setContent(feature.properties.Dam_Name);
-    return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(newpopup);
+    return L.circleMarker(latlng, geojsonMarkerOptions);
   }
 
-	// Use ajax call to get data. After data comes back apply styles and bind popup
+  // Create a function to generate popup content
+  function bindPopup(feature, layer) {
+	  var popupcontent = [];
+		for (var prop in feature.properties) {
+			popupcontent.push("<td>" + prop + "</td><td>" + feature.properties[prop] + "</td>");
+		}
+	  var popupTable = "<div><table><tr>" + popupcontent.join("</tr>") + "</div></table>"
+		layer.bindPopup(popupTable);
+  }
+
+  // Use ajax call to get data. After data comes back apply styles and bind popup
   // If you're experienced with jQuery, you'll recognize we're making a GET 
   // request and expecting JSON in the response body. 
   // We're also passing in a callback function that takes the response JSON and adds it to the document.
@@ -89,7 +106,7 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
     /********************************************************************************
       ADD MARKER CLUSTER LAYER
     ********************************************************************************/
-    // This functionaility is provided by Leaflet Marker Cluster Library
+    // This functionaility is provided by Leaflet Marker Cluster ibrary
     clusteredMarkers = L.markerClusterGroup();
     clusteredMarkers.addLayer(damLocations);
     layerControl.addOverlay(clusteredMarkers, "Dam Locations (Clustered)");
@@ -106,11 +123,13 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
   ********************************************************************************/
 
   // Create a new Leaflet layer control
-  var layerControl = L.control.layers(null, null, { position: 'bottomleft', }).addTo(map);
+  var layerControl = L.control.layers(null, null, { position: 'bottomleft' }).addTo(map);
 
   // Add basemap defined earlier to layer control
   layerControl.addBaseLayer(Esri_WorldImagery, "Imagery");
-
+  layerControl.addBaseLayer(Topo_WorldImagery, "TopoImagery");
+  layerControl.addBaseLayer(ImageryTopo_WorldImagery, "ImageryTopoImagery");
+  layerControl.addBaseLayer(HydroNHD_WorldImagery, "HydroNHDImagery");
 
 
   function getFilterFunc(value) {
@@ -148,16 +167,13 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
     Add table - http://leafletjs.com/examples/choropleth/
   ********************************************************************************/	
 	
-	var info = L.control({
-		position: 'bottomright',
-		});
+	var info = L.control({position: 'bottomright'});
 
 	info.onAdd = function (map) {
 		this._div = L.DomUtil.create('div', 'info'); 
 		this.update();
 		return this._div;
-	}
-
+	};
 	
 	var table = document.createElement('table');
 	var theader1 = document.createElement('th');
@@ -165,8 +181,8 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 	var theader3 = document.createElement('th');
 	var trH = document.createElement('tr');
 	var headertext1 = document.createTextNode('Dam Name');
-	var headertext2 = document.createTextNode('Type');
-	var headertext3 = document.createTextNode('Height');
+	var headertext2 = document.createTextNode('   Dam Type');
+	var headertext3 = document.createTextNode('   Dam Height');
 	theader1.appendChild(headertext1);
 	theader2.appendChild(headertext2);
 	theader3.appendChild(headertext3);
@@ -200,14 +216,23 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 
 
 		this._div.appendChild(table);
+		console.log(table);
 		
 
 	};
 
 	info.addTo(map);
 	
-	function bringToFront(e) {
+	function highlightFeature(e) {
 		var layer = e.target;
+
+		layer.setStyle({
+			weight: 2,
+			color: '#a63603',
+			fillColor: '#e6550d',
+			dashArray: '',
+			fillOpacity: 0.9
+		});
 
 		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
 			layer.bringToFront();
@@ -218,41 +243,21 @@ var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 	function updateInfo(e) {
 		var layer = e.target;	
 		info.update(layer.feature.properties);
-		layer.setStyle({
-			weight: 2,
-			color: '#a63603',
-			fillColor: '#e6550d',
-			dashArray: '',
-			fillOpacity: 0.9
-		});		
+	}
+
+	function resetHighlight(e) {
+		damLocations.resetStyle(e.target);
 	}
 
 
 	function onEachFeature(feature, layer) {
 		layer.on({
 			click: updateInfo,
-			mouseover: bringToFront
+			mouseover: highlightFeature,
+			mouseout: resetHighlight
 		});
 	}
 
-function onMapClick(e) {
-   	var table2 = document.createElement('table');
-	table2.appendChild(trH);
-	table=table2;
-   info._div.innerHTML='';  
-   map.eachLayer(function (layer) { 
-   layer.closePopup()});
-   damLocations.setStyle({
-    radius: 7,
-    fillColor: "#fdae6b",
-    color: "#e6550d",
-    weight: 1,
-    opacity: 1,
-    fillOpacity: 0.8
-		});
-}
-
-map.on('click', onMapClick);	
-
+	
 })();
 
