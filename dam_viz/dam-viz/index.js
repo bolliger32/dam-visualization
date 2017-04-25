@@ -180,6 +180,8 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
             if (feature.properties[varName] >= compVal) return false;
           }
         }
+        
+        // If all_purposes, where you're selecting if a 
       }
       return true;
     }
@@ -209,7 +211,7 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
     filterDiv.appendChild(newSelector);
     
     var valueType = filterJSON['types'][varName];
-    if(valueType === "str") {
+    if(valueType === "str" || valueType === "multiple") {
       var boxes = [];
       $(document).ready(function(){
         $.each(filterJSON['vals'][varName],function(index,value){
@@ -218,8 +220,10 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
           boxes.push(checkbox);
         })
       });
-      newSelector.innerHTML = "<table><tr>" + boxes.join("</tr>") + "</table>";
-    } else if (valueType === "float") {
+      newSelector.innerHTML = '<table><tr>' + boxes.join("</tr>") + "</table>";
+      if (valueType === "multiple") newSelector.innerHTML = '<div><label for="exclude">Exclude selected</label><input type="checkbox" id="exclude"></div>' + newSelector.innerHTML;
+    } 
+    else if (valueType === "float") {
       newSelector.innerHTML = '<select><option value="=">=</option><option value=">">\></option><option value="<">\<</option></select><input type="text" class="textVarEntry"><div><label for="inclVar'+varName+'">Include missing</label><input type="checkbox" id="inclVar'+varName+'"></div>'
     }
   }
