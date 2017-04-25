@@ -63,17 +63,12 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   // Create a function to create a custom marker
   function createMarker(feature, latlng) {
 	  var newpopup = L.popup({ closeOnClick: false, autoClose: false }).setContent(feature.properties.Dam_Name);
+//    var popupcontent = [];
+//		for (var prop in feature.properties) {
+//			popupcontent.push("<td>" + prop + "</td><td>" + feature.properties[prop] + "</td>");
+//		}
+//	  var popupTable = "<div><table><tr>" + popupcontent.join("</tr>") + "</div></table>";
     return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(newpopup);
-  }
-
-  // Create a function to generate popup content
-  function bindPopup(feature, layer) {
-	  var popupcontent = [];
-		for (var prop in feature.properties) {
-			popupcontent.push("<td>" + prop + "</td><td>" + feature.properties[prop] + "</td>");
-		}
-	  var popupTable = "<div><table><tr>" + popupcontent.join("</tr>") + "</div></table>"
-		layer.bindPopup(popupTable);
   }
 
   // Get variables and values JSON for use later on in filter creation
@@ -81,7 +76,7 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
     var filterJSON = null;
     $.ajax({
         'url':"../assets/data/filterText.json",
-        'success': function(data) {filterJSON=data},
+        'success': function(data) {filterJSON=data;},
         'async': false,
         'global': false,
         'dataType': "json"});
@@ -145,48 +140,118 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
 
 
 
-  function getFilterFunc(value) {
+  function getFilterFunc(filters) {
+    var num_filters = filters.childNodes.length;
     var filterFunc = function(feature, layer) {
-      return feature.properties.Dam_Type === value ? true : false;
+      var res = true;
+      for (var i = 0; i < num_filters; i++) {
+        var curFilter = filters.childNodes[i]
+        
+        var varName = curFilter.childNodes[0].value;
+        var valFilter = curFilter.childNodes[1]
+        
+        // if Categorical filter, check all checkboxes
+        if (filterJSON['types'][varName] === "str") {
+          var passFilter = false;
+          var selected = [];
+          for (index in filterJSON['vals'][varName]) {
+            var curValName = filterJSON['vals'][varName][index];
+            var tmpValName = curValName.replace(/,/g,"_");
+            var tmpValName = tmpValName.replace(/ /g,"_");
+            var curVal = document.getElementById(tmpValName);
+            if (curVal.checked) {
+              if (feature.properties[varName] == curValName) passFilter = true;
+            }
+          }
+          if (passFilter == false) return false;
+        }
+      }
+      return true;
     }
     return filterFunc;
   }
   
-  function applyFilter(value) {
+  function applyFilter(filters) {
     map.removeLayer(damLocations);
     clusteredMarkers.clearLayers();
     layerControl.removeLayer(damLocations);
     layerControl.removeLayer(clusteredMarkers);
-    if (value === "reset") {
-      addDams()
+    if (filters == "reset") {
+      addDams();
     } else {
-      var filterFunc = getFilterFunc(value);
+      var filterFunc = getFilterFunc(filters);
       addDams(filterFunc);
     }
   }
   
-  function switchAvailValues(selector,varName) {
-    $(selector).empty();
-    selector.options[0] = new Option('Choose '+varName+':',"reset");
-    for(index in filterJSON['vals'][varName]) {
-      selector.options[selector.options.length] = new Option(filterJSON['vals'][varName][index], filterJSON['vals'][varName][index]);
+  function switchAvailValues(filterDiv,varName) {
+    if (filterDiv.childNodes.length > 1) {
+      filterDiv.removeChild(filterDiv.childNodes[1]);
     }
-    selector.onchange = function () {applyFilter(selector.value)};
+    
+    var newSelector = document.createElement("div");
+    newSelector.class = "valFilter";
+    filterDiv.appendChild(newSelector);
+    
+    var valueType = filterJSON['types'][varName];
+    if(valueType === "str") {
+      var boxes = [];
+      $(document).ready(function(){
+        $.each(filterJSON['vals'][varName],function(index,value){
+          var val = value.replace(/,/g,"_").replace(/ /g,"_");
+          var checkbox="<td><label for="+val+">"+value+"</label></td><td><input type='checkbox' id="+val+" value="+val+" name="+val+"></td>";
+          boxes.push(checkbox);
+        })
+      });
+      newSelector.innerHTML = "<table><tr>" + boxes.join("</tr>") + "</table>";
+    }
   }
   
+  function removeFilters(filterDiv) {
+    while (filterDiv.childNodes.length > 1) {
+      filterDiv.removeChild(filterDiv.lastChild);
+    }
+    while (filterDiv.firstChild.childNodes.length > 1) {
+      filterDiv.firstChild.removeChild(filterDiv.firstChild.lastChild);
+    }
+    filterDiv.firstChild.firstChild.value = "selectVar0";
+  }
   
+  function addFilter(filtersDiv) {
+    var numFilters = filtersDiv.childNodes.length;
+    var newFilterDiv = document.createElement("div");
+    newFilterDiv.style.maxHeight = "200px";
+    newFilterDiv.style.overflow = "auto";
+    newFilterDiv.innerHTML = '<select id="varSel"><option value="selectVar'+numFilters.toString()+'">Select Variable:</option></select>'
+    filtersDiv.appendChild(newFilterDiv);
+    var newFilter = filtersDiv.lastChild;
+    var varSel = newFilter.firstChild;
+    for(index in filterJSON['types']) {
+      varSel.options[varSel.options.length] = new Option(index, index)
+    }
+    varSel.onchange = function() {switchAvailValues(newFilter,varSel.value)};
+  }
   var filterBar = L.control({position: 'topright'});
 	filterBar.onAdd = function () {
 //    var var_selector_div = L.DomUtil.create('div', 'info legend');
 //    var_selector_div.innerHTML = '<select><option>Test</select></option>';
 		var div = L.DomUtil.create('div', 'info legend');
-		div.innerHTML = '<select id="varSel"><option value=null>Select Variable:</option></select><select id="valSel"></select>';
-    var varSel = div.firstChild;
-    var valSel = div.childNodes[1];
+		div.innerHTML = '<input type="button" id="addFilterRow" value="+"><input type="button" id="resetFilter" value="Reset Filters"><input type="button" id="applyFilter" value="Apply Filters"><div id="filters" style="max-height:500px; overflow:auto"><div id="filter0" style="max-height:200px; overflow:auto"><select id="varSel"><option value="selectVar0">Select Variable:</option></select></div></div>';
+    var addFilterButton = div.childNodes[0];
+    var clearFilterButton = div.childNodes[1];
+    var applyFilterButton = div.childNodes[2];
+    
+    var filters = div.childNodes[3];
+    var filter0 = filters.firstChild;
+    var varSel = filter0.firstChild;
+    
     for(index in filterJSON['types']) {
       varSel.options[varSel.options.length] = new Option(index, index)
     }
-    varSel.onchange = function() {switchAvailValues(valSel,varSel.value)};
+    varSel.onchange = function() {switchAvailValues(filter0,varSel.value)};
+    addFilterButton.onclick = function() {addFilter(filters)};
+    applyFilterButton.onclick = function() {applyFilter(filters)};
+    clearFilterButton.onclick = function() {applyFilter("reset"); removeFilters(filters);};
       
 //    div.innerHTML = '<select><option value="reset">Dam Type</option><option value="Rockfill">Rockfill</option><option value="Earth">Earth</option><option value="Multi-Arch">Multi-Arch</option><option value="Timber Crib">Timber Crib</option><option value="RCC">RCC</option><option value="Masonry">Masonry</option><option value="Stone">Stone</option><option value="Concrete">Concrete</option><option value="Gravity">Gravity</option><option value="Arch">Arch</option><option value="Buttress">Buttress</option><option value="Other">Other</option></select>';
 //		selector.onchange = function () {applyFilter(selector.value)};
