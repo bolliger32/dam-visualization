@@ -169,7 +169,10 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
         else if (filterJSON['types'][varName] === "float") {
           var compType = valFilter.childNodes[0].value;
           var compVal = parseFloat(valFilter.childNodes[1].value);
-          if (compType == "=") {
+          var inclNull = valFilter.childNodes[2].childNodes[1].checked;
+          if (feature.properties[varName] == null) {
+            return inclNull? true : false;
+          } else if (compType == "=") {
             if (feature.properties[varName] != compVal) return false;
           } else if (compType == ">") {
             if (feature.properties[varName] <= compVal) return false;
@@ -217,7 +220,7 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
       });
       newSelector.innerHTML = "<table><tr>" + boxes.join("</tr>") + "</table>";
     } else if (valueType === "float") {
-      newSelector.innerHTML = '<select><option value="=">=</option><option value=">">\></option><option value="<">\<</option></select><input type="text" class="textVarEntry">'
+      newSelector.innerHTML = '<select><option value="=">=</option><option value=">">\></option><option value="<">\<</option></select><input type="text" class="textVarEntry"><div><label for="inclVar'+varName+'">Include missing</label><input type="checkbox" id="inclVar'+varName+'"></div>'
     }
   }
   
