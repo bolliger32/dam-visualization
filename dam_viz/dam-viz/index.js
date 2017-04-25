@@ -143,7 +143,6 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   function getFilterFunc(filters) {
     var num_filters = filters.childNodes.length;
     var filterFunc = function(feature, layer) {
-      var res = true;
       for (var i = 0; i < num_filters; i++) {
         var curFilter = filters.childNodes[i]
         
@@ -164,6 +163,19 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
             }
           }
           if (passFilter == false) return false;
+        }
+        
+        // If numerical filter, use >,<,= functionality
+        else if (filterJSON['types'][varName] === "float") {
+          var compType = valFilter.childNodes[0].value;
+          var compVal = parseFloat(valFilter.childNodes[1].value);
+          if (compType == "=") {
+            if (feature.properties[varName] != compVal) return false;
+          } else if (compType == ">") {
+            if (feature.properties[varName] <= compVal) return false;
+          } else if (compType == "<") {
+            if (feature.properties[varName] >= compVal) return false;
+          }
         }
       }
       return true;
@@ -204,6 +216,8 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
         })
       });
       newSelector.innerHTML = "<table><tr>" + boxes.join("</tr>") + "</table>";
+    } else if (valueType === "float") {
+      newSelector.innerHTML = '<select><option value="=">=</option><option value=">">\></option><option value="<">\<</option></select><input type="text" class="textVarEntry">'
     }
   }
   
@@ -233,8 +247,6 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   }
   var filterBar = L.control({position: 'topright'});
 	filterBar.onAdd = function () {
-//    var var_selector_div = L.DomUtil.create('div', 'info legend');
-//    var_selector_div.innerHTML = '<select><option>Test</select></option>';
 		var div = L.DomUtil.create('div', 'info legend');
 		div.innerHTML = '<input type="button" id="addFilterRow" value="+"><input type="button" id="resetFilter" value="Reset Filters"><input type="button" id="applyFilter" value="Apply Filters"><div id="filters" style="max-height:500px; overflow:auto"><div id="filter0" style="max-height:200px; overflow:auto"><select id="varSel"><option value="selectVar0">Select Variable:</option></select></div></div>';
     var addFilterButton = div.childNodes[0];
