@@ -63,17 +63,12 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   // Create a function to create a custom marker
   function createMarker(feature, latlng) {
 	  var newpopup = L.popup({ closeOnClick: false, autoClose: false }).setContent(feature.properties.Dam_Name);
+//    var popupcontent = [];
+//		for (var prop in feature.properties) {
+//			popupcontent.push("<td>" + prop + "</td><td>" + feature.properties[prop] + "</td>");
+//		}
+//	  var popupTable = "<div><table><tr>" + popupcontent.join("</tr>") + "</div></table>";
     return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(newpopup);
-  }
-
-  // Create a function to generate popup content
-  function bindPopup(feature, layer) {
-	  var popupcontent = [];
-		for (var prop in feature.properties) {
-			popupcontent.push("<td>" + prop + "</td><td>" + feature.properties[prop] + "</td>");
-		}
-	  var popupTable = "<div><table><tr>" + popupcontent.join("</tr>") + "</div></table>"
-		layer.bindPopup(popupTable);
   }
 
   // Get variables and values JSON for use later on in filter creation
@@ -145,14 +140,15 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
 
 
 
-  function getFilterFunc(value) {
+  function getFilterFunc(varName,value) {
     var filterFunc = function(feature, layer) {
-      return feature.properties.Dam_Type === value ? true : false;
+      return feature.properties[varName] === value ? true : false;
     }
     return filterFunc;
   }
   
-  function applyFilter(value) {
+  function applyFilter(varName,value) {
+    console.log(value);
     map.removeLayer(damLocations);
     clusteredMarkers.clearLayers();
     layerControl.removeLayer(damLocations);
@@ -160,7 +156,7 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
     if (value === "reset") {
       addDams()
     } else {
-      var filterFunc = getFilterFunc(value);
+      var filterFunc = getFilterFunc(varName,value);
       addDams(filterFunc);
     }
   }
@@ -171,7 +167,7 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
     for(index in filterJSON['vals'][varName]) {
       selector.options[selector.options.length] = new Option(filterJSON['vals'][varName][index], filterJSON['vals'][varName][index]);
     }
-    selector.onchange = function () {applyFilter(selector.value)};
+    selector.onchange = function () {applyFilter(varName,selector.value)};
   }
   
   
@@ -180,7 +176,7 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
 //    var var_selector_div = L.DomUtil.create('div', 'info legend');
 //    var_selector_div.innerHTML = '<select><option>Test</select></option>';
 		var div = L.DomUtil.create('div', 'info legend');
-		div.innerHTML = '<select id="varSel"><option value=null>Select Variable:</option></select><select id="valSel"></select>';
+		div.innerHTML = '<select id="varSel"><option value=null>Select Variable:</option></select><select id="valSel" multiple="true"></select>';
     var varSel = div.firstChild;
     var valSel = div.childNodes[1];
     for(index in filterJSON['types']) {
