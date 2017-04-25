@@ -114,9 +114,6 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
     // Note: $.getJSON method is asynchronous. Although we intialize layerControl later in the code
     // it should already exists by the time this code runs. 
     layerControl.addOverlay(damLocations, "Dam Locations");
-  layerControl.addBaseLayer(Topo_WorldImagery, "Topo Imagery");
-  layerControl.addBaseLayer(ImageryTopo_WorldImagery, "ImageryTopoImagery");
-  layerControl.addBaseLayer(HydroNHD_WorldImagery, "Hydro Imagery");
 
     /********************************************************************************
       ADD MARKER CLUSTER LAYER
@@ -138,10 +135,13 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   ********************************************************************************/
 
   // Create a new Leaflet layer control
-  var layerControl = L.control.layers(null, null, { position: 'bottomleft', }).addTo(map);
+  var layerControl = L.control.layers(null, null, { position: 'topleft', }).addTo(map);
 
   // Add basemap defined earlier to layer control
   layerControl.addBaseLayer(Esri_WorldImagery, "Imagery");
+  layerControl.addBaseLayer(Topo_WorldImagery, "Topography");
+  layerControl.addBaseLayer(ImageryTopo_WorldImagery, "Imagery + Topography");
+  layerControl.addBaseLayer(HydroNHD_WorldImagery, "Hydrography");
 
 
 
@@ -167,9 +167,11 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   
   function switchAvailValues(selector,varName) {
     $(selector).empty();
+    selector.options[0] = new Option('Choose '+varName+':',"reset");
     for(index in filterJSON['vals'][varName]) {
       selector.options[selector.options.length] = new Option(filterJSON['vals'][varName][index], filterJSON['vals'][varName][index]);
     }
+    selector.onchange = function () {applyFilter(selector.value)};
   }
   
   
