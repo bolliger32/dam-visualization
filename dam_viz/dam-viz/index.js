@@ -6,8 +6,8 @@
   //Initialize a new Leaflet map object
   //Pass an object of options to initialization function
   var map = L.map('map', {
-	center: [38, -120.5],
-    zoom: 6,
+	center: [38, -98],
+    zoom: 3,
     minZoom: 1,
     maxZoom: 16,
     attributionControl: true,
@@ -87,7 +87,7 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   // request and expecting JSON in the response body. 
   // We're also passing in a callback function that takes the response JSON and adds it to the document.
   function addDams(filterFunc) {
-    $.getJSON("../assets/data/dams_CA.geojson", function(data) {
+    $.getJSON("../assets/data/dams.geojson", function(data) {
 
     // Create new L.geoJson layer with data recieved from geojson file
     // and set the damLocations variable to new L.geoJson layer
