@@ -161,6 +161,8 @@ map.on('zoomend', function(){
     if (z > 8) {
         return damLocations.addTo(map);
 		return clusteredMarkers.removeFrom(map);
+		map.removeLayer(damLocations);
+    clusteredMarkers.clearLayers();
     }
     if (z < 8) {
         return damLocations.removeFrom(map);
