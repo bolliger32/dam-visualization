@@ -144,10 +144,10 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
     var num_filters = filters.childNodes.length;
     var filterFunc = function(feature, layer) {
       for (var i = 0; i < num_filters; i++) {
-        var curFilter = filters.childNodes[i]
+        var curFilter = filters.childNodes[i];
         
         var varName = curFilter.childNodes[0].value;
-        var valFilter = curFilter.childNodes[1]
+        var valFilter = curFilter.childNodes[1];
         
         // if Categorical filter, check all checkboxes
         if (filterJSON['types'][varName] === "str") {
@@ -160,6 +160,8 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
             var curVal = document.getElementById(tmpValName);
             if (curVal.checked) {
               if (feature.properties[varName] == curValName) passFilter = true;
+              // Check for nulls
+              if ((curValName == 'unlabled') && (feature.properties[varName] == null)) passFilter = true;
             }
           }
           if (passFilter == false) return false;
@@ -181,7 +183,43 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
           }
         }
         
-        // If all_purposes, where you're selecting if a 
+        // If all_purposes, where you're selecting if a certain purpose
+        // falls in or doesn't fall in the list
+        else if (filterJSON['types'][varName] === "multiple") {
+          // Deal with nulls not having ".includes" method
+          if (feature.properties[varName] == null) var thisVal = 'unlabled';
+          else var thisVal = feature.properties[varName];
+          
+          var compType = valFilter.firstChild.firstChild.value;
+          if (compType == "include_any" || compType == "exclude_all") var passFilter = false;
+          else var passFilter = true;
+          for (index in filterJSON['vals'][varName]) {
+            var curValName = filterJSON['vals'][varName][index];
+            var tmpValName = curValName.replace(/,/g,"_");
+            var tmpValName = tmpValName.replace(/ /g,"_");
+            var curVal = document.getElementById(tmpValName);
+            if (curVal.checked) {
+              if (compType == "include_any") {
+                if (thisVal.includes(curValName)) {
+                  passFilter = true;
+                }
+              } else if (compType == "exclude_any") {
+                if (thisVal.includes(curValName)) {
+                  passFilter = false;
+                }
+              } else if (compType == "include_all") {
+                if (!(thisVal.includes(curValName))) {
+                  passFilter = false;
+                }
+              } else if (compType == "exclude_all") {
+                if (!(thisVal.includes(curValName))) {
+                  passFilter = true;
+                }
+              }
+            } 
+          }
+          if (passFilter == false) return false;
+        }
       }
       return true;
     }
@@ -221,10 +259,10 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
         })
       });
       newSelector.innerHTML = '<table><tr>' + boxes.join("</tr>") + "</table>";
-      if (valueType === "multiple") newSelector.innerHTML = '<div><label for="exclude">Exclude selected</label><input type="checkbox" id="exclude"></div>' + newSelector.innerHTML;
+      if (valueType === "multiple") newSelector.innerHTML = '<div><select><option value="include_any">Include if Any Match</option><option value="exclude_any">Exclude if Any Match</option><option value="include_all">Include if All Match</option><option value="exclude_all">Exclude if All Match</option></select></div>' + newSelector.innerHTML;
     } 
     else if (valueType === "float") {
-      newSelector.innerHTML = '<select><option value="=">=</option><option value=">">\></option><option value="<">\<</option></select><input type="text" class="textVarEntry"><div><label for="inclVar'+varName+'">Include missing</label><input type="checkbox" id="inclVar'+varName+'"></div>'
+      newSelector.innerHTML = '<select id="multipleCompType"><option value="=">=</option><option value=">">\></option><option value="<">\<</option></select><input type="text" class="textVarEntry"><div><label for="inclVar'+varName+'">Include missing</label><input type="checkbox" id="inclVar'+varName+'"></div>'
     }
   }
   
