@@ -63,10 +63,26 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   // Create a function to create a custom marker
   function createMarker(feature, latlng) {
 	  var newpopup = L.popup({ closeOnClick: false, autoClose: false }).setContent(feature.properties.Dam_Name);
+//    var popupcontent = [];
+//		for (var prop in feature.properties) {
+//			popupcontent.push("<td>" + prop + "</td><td>" + feature.properties[prop] + "</td>");
+//		}
+//	  var popupTable = "<div><table><tr>" + popupcontent.join("</tr>") + "</div></table>";
     return L.circleMarker(latlng, geojsonMarkerOptions).bindPopup(newpopup);
   }
 
-	// Use ajax call to get data. After data comes back apply styles and bind popup
+  // Get variables and values JSON for use later on in filter creation
+  var filterJSON = (function () {
+    var filterJSON = null;
+    $.ajax({
+        'url':"../assets/data/filterText.json",
+        'success': function(data) {filterJSON=data;},
+        'async': false,
+        'global': false,
+        'dataType': "json"});
+    return filterJSON; })();
+  
+  // Use ajax call to get data. After data comes back apply styles and bind popup
   // If you're experienced with jQuery, you'll recognize we're making a GET 
   // request and expecting JSON in the response body. 
   // We're also passing in a callback function that takes the response JSON and adds it to the document.
@@ -93,9 +109,6 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
     // Note: $.getJSON method is asynchronous. Although we intialize layerControl later in the code
     // it should already exists by the time this code runs. 
     layerControl.addOverlay(damLocations, "Dam Locations");
-  layerControl.addBaseLayer(Topo_WorldImagery, "Topo Imagery");
-  layerControl.addBaseLayer(ImageryTopo_WorldImagery, "ImageryTopoImagery");
-  layerControl.addBaseLayer(HydroNHD_WorldImagery, "Hydro Imagery");
 
     /********************************************************************************
       ADD MARKER CLUSTER LAYER
@@ -117,40 +130,151 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   ********************************************************************************/
 
   // Create a new Leaflet layer control
-  var layerControl = L.control.layers(null, null, { position: 'bottomleft', }).addTo(map);
+  var layerControl = L.control.layers(null, null, { position: 'topleft', }).addTo(map);
 
   // Add basemap defined earlier to layer control
   layerControl.addBaseLayer(Esri_WorldImagery, "Imagery");
+  layerControl.addBaseLayer(Topo_WorldImagery, "Topography");
+  layerControl.addBaseLayer(ImageryTopo_WorldImagery, "Imagery + Topography");
+  layerControl.addBaseLayer(HydroNHD_WorldImagery, "Hydrography");
 
 
 
-  function getFilterFunc(value) {
+  function getFilterFunc(filters) {
+    var num_filters = filters.childNodes.length;
     var filterFunc = function(feature, layer) {
-      return feature.properties.Dam_Type === value ? true : false;
+      for (var i = 0; i < num_filters; i++) {
+        var curFilter = filters.childNodes[i]
+        
+        var varName = curFilter.childNodes[0].value;
+        var valFilter = curFilter.childNodes[1]
+        
+        // if Categorical filter, check all checkboxes
+        if (filterJSON['types'][varName] === "str") {
+          var passFilter = false;
+          var selected = [];
+          for (index in filterJSON['vals'][varName]) {
+            var curValName = filterJSON['vals'][varName][index];
+            var tmpValName = curValName.replace(/,/g,"_");
+            var tmpValName = tmpValName.replace(/ /g,"_");
+            var curVal = document.getElementById(tmpValName);
+            if (curVal.checked) {
+              if (feature.properties[varName] == curValName) passFilter = true;
+            }
+          }
+          if (passFilter == false) return false;
+        }
+        
+        // If numerical filter, use >,<,= functionality
+        else if (filterJSON['types'][varName] === "float") {
+          var compType = valFilter.childNodes[0].value;
+          var compVal = parseFloat(valFilter.childNodes[1].value);
+          var inclNull = valFilter.childNodes[2].childNodes[1].checked;
+          if (feature.properties[varName] == null) {
+            return inclNull? true : false;
+          } else if (compType == "=") {
+            if (feature.properties[varName] != compVal) return false;
+          } else if (compType == ">") {
+            if (feature.properties[varName] <= compVal) return false;
+          } else if (compType == "<") {
+            if (feature.properties[varName] >= compVal) return false;
+          }
+        }
+        
+        // If all_purposes, where you're selecting if a 
+      }
+      return true;
     }
     return filterFunc;
   }
   
-  function applyFilter(value) {
+  function applyFilter(filters) {
     map.removeLayer(damLocations);
     clusteredMarkers.clearLayers();
     layerControl.removeLayer(damLocations);
     layerControl.removeLayer(clusteredMarkers);
-    if (value === "reset") {
-      addDams()
+    if (filters == "reset") {
+      addDams();
     } else {
-      var filterFunc = getFilterFunc(value);
+      var filterFunc = getFilterFunc(filters);
       addDams(filterFunc);
     }
   }
   
+  function switchAvailValues(filterDiv,varName) {
+    if (filterDiv.childNodes.length > 1) {
+      filterDiv.removeChild(filterDiv.childNodes[1]);
+    }
+    
+    var newSelector = document.createElement("div");
+    newSelector.class = "valFilter";
+    filterDiv.appendChild(newSelector);
+    
+    var valueType = filterJSON['types'][varName];
+    if(valueType === "str" || valueType === "multiple") {
+      var boxes = [];
+      $(document).ready(function(){
+        $.each(filterJSON['vals'][varName],function(index,value){
+          var val = value.replace(/,/g,"_").replace(/ /g,"_");
+          var checkbox="<td><label for="+val+">"+value+"</label></td><td><input type='checkbox' id="+val+" value="+val+" name="+val+"></td>";
+          boxes.push(checkbox);
+        })
+      });
+      newSelector.innerHTML = '<table><tr>' + boxes.join("</tr>") + "</table>";
+      if (valueType === "multiple") newSelector.innerHTML = '<div><label for="exclude">Exclude selected</label><input type="checkbox" id="exclude"></div>' + newSelector.innerHTML;
+    } 
+    else if (valueType === "float") {
+      newSelector.innerHTML = '<select><option value="=">=</option><option value=">">\></option><option value="<">\<</option></select><input type="text" class="textVarEntry"><div><label for="inclVar'+varName+'">Include missing</label><input type="checkbox" id="inclVar'+varName+'"></div>'
+    }
+  }
+  
+  function removeFilters(filterDiv) {
+    while (filterDiv.childNodes.length > 1) {
+      filterDiv.removeChild(filterDiv.lastChild);
+    }
+    while (filterDiv.firstChild.childNodes.length > 1) {
+      filterDiv.firstChild.removeChild(filterDiv.firstChild.lastChild);
+    }
+    filterDiv.firstChild.firstChild.value = "selectVar0";
+  }
+  
+  function addFilter(filtersDiv) {
+    var numFilters = filtersDiv.childNodes.length;
+    var newFilterDiv = document.createElement("div");
+    newFilterDiv.style.maxHeight = "200px";
+    newFilterDiv.style.overflow = "auto";
+    newFilterDiv.innerHTML = '<select id="varSel"><option value="selectVar'+numFilters.toString()+'">Select Variable:</option></select>'
+    filtersDiv.appendChild(newFilterDiv);
+    var newFilter = filtersDiv.lastChild;
+    var varSel = newFilter.firstChild;
+    for(index in filterJSON['types']) {
+      varSel.options[varSel.options.length] = new Option(index, index)
+    }
+    varSel.onchange = function() {switchAvailValues(newFilter,varSel.value)};
+  }
   var filterBar = L.control({position: 'topright'});
 	filterBar.onAdd = function () {
 		var div = L.DomUtil.create('div', 'info legend');
-		div.innerHTML = '<select><option value="reset">Dam Type</option><option value="Rockfill">Rockfill</option><option value="Earth">Earth</option><option value="Multi-Arch">Multi-Arch</option><option value="Timber Crib">Timber Crib</option><option value="RCC">RCC</option><option value="Masonry">Masonry</option><option value="Stone">Stone</option><option value="Concrete">Concrete</option><option value="Gravity">Gravity</option><option value="Arch">Arch</option><option value="Buttress">Buttress</option><option value="Other">Other</option></select>';
-    var selector = div.firstChild;
-		selector.onchange = function () {applyFilter(selector.value)};
-    selector.onmousedown = selector.ondblclick = L.DomEvent.stopPropagation;
+		div.innerHTML = '<input type="button" id="addFilterRow" value="+"><input type="button" id="resetFilter" value="Reset Filters"><input type="button" id="applyFilter" value="Apply Filters"><div id="filters" style="max-height:500px; overflow:auto"><div id="filter0" style="max-height:200px; overflow:auto"><select id="varSel"><option value="selectVar0">Select Variable:</option></select></div></div>';
+    var addFilterButton = div.childNodes[0];
+    var clearFilterButton = div.childNodes[1];
+    var applyFilterButton = div.childNodes[2];
+    
+    var filters = div.childNodes[3];
+    var filter0 = filters.firstChild;
+    var varSel = filter0.firstChild;
+    
+    for(index in filterJSON['types']) {
+      varSel.options[varSel.options.length] = new Option(index, index)
+    }
+    varSel.onchange = function() {switchAvailValues(filter0,varSel.value)};
+    addFilterButton.onclick = function() {addFilter(filters)};
+    applyFilterButton.onclick = function() {applyFilter(filters)};
+    clearFilterButton.onclick = function() {applyFilter("reset"); removeFilters(filters);};
+      
+//    div.innerHTML = '<select><option value="reset">Dam Type</option><option value="Rockfill">Rockfill</option><option value="Earth">Earth</option><option value="Multi-Arch">Multi-Arch</option><option value="Timber Crib">Timber Crib</option><option value="RCC">RCC</option><option value="Masonry">Masonry</option><option value="Stone">Stone</option><option value="Concrete">Concrete</option><option value="Gravity">Gravity</option><option value="Arch">Arch</option><option value="Buttress">Buttress</option><option value="Other">Other</option></select>';
+//		selector.onchange = function () {applyFilter(selector.value)};
+//    selector.onmousedown = selector.ondblclick = L.DomEvent.stopPropagation;
 		return div;
 	};
 	map.addControl(filterBar);
