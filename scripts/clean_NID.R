@@ -34,5 +34,17 @@ dams <- dams %>%
 key <- seq(1,nrow(dams))
 dams<-cbind(key, dams)
 
+### DELETE DAMS WITH HYDROELECTRIC PURPOSE
+dams_hydroelectric <- factor()
+for(i in 1:nrow(dams)){
+  purposes <- c(as.character(dams[i,"Primary_Purpose"]),strsplit(as.character(dams[i,"All_Purposes"]),', ',fixed=TRUE))
+  if("Hydroelectric" %in% purposes[[1]] | "Hydroelectric" %in% purposes[[2]]) {
+    dams_hydroelectric <- c(dams_hydroelectric,dams[i,"key"])
+  }
+  
+}
+
+dams <- subset(dams, !dams$key %in% dams_hydroelectric)
+
 ### SAVE AS .CSV
 write.csv(dams, file="../data/dams.csv",row.names = F)
