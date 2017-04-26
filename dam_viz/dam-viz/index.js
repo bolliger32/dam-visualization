@@ -144,10 +144,10 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
     var num_filters = filters.childNodes.length;
     var filterFunc = function(feature, layer) {
       for (var i = 0; i < num_filters; i++) {
-        var curFilter = filters.childNodes[i]
+        var curFilter = filters.childNodes[i];
         
         var varName = curFilter.childNodes[0].value;
-        var valFilter = curFilter.childNodes[1]
+        var valFilter = curFilter.childNodes[1];
         
         // if Categorical filter, check all checkboxes
         if (filterJSON['types'][varName] === "str") {
@@ -160,6 +160,8 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
             var curVal = document.getElementById(tmpValName);
             if (curVal.checked) {
               if (feature.properties[varName] == curValName) passFilter = true;
+              // Check for nulls
+              if ((curValName == 'unlabled') && (feature.properties[varName] == null)) passFilter = true;
             }
           }
           if (passFilter == false) return false;
@@ -181,7 +183,36 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
           }
         }
         
-        // If all_purposes, where you're selecting if a 
+        // If all_purposes, where you're selecting if a certain purpose
+        // falls in or doesn't fall in the list
+        else if (filterJSON['types'][varName] === "multiple") {
+          var excl = document.getElementById("exclude").checked;
+          if (excl) var passFilter = true;
+          else var passFilter = false;
+          for (index in filterJSON['vals'][varName]) {
+            var curValName = filterJSON['vals'][varName][index];
+            var tmpValName = curValName.replace(/,/g,"_");
+            var tmpValName = tmpValName.replace(/ /g,"_");
+            var curVal = document.getElementById(tmpValName);
+            if (curVal.checked) {
+              if (excl) {
+                if (feature.properties[varName] == null) {
+                  if (curValName == 'unlabled') passFilter = false;
+                }
+                else if (feature.properties[varName].includes(curValName)) passFilter = false;
+              } 
+              else {
+                if (feature.properties[varName] == null) {
+                  if (curValName == 'unlabled') passFilter = true;
+                }
+                else if (feature.properties[varName].includes(curValName)) {
+                  passFilter = true;
+                }
+              }
+            } 
+          }
+          if (passFilter == false) return false;
+        }
       }
       return true;
     }
