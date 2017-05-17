@@ -79,7 +79,7 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   var filterJSON = (function () {
     var filterJSON = null;
     $.ajax({
-        'url':"filterText.json",
+        'url':"data/filterText.json",
         'success': function(data) {filterJSON=data;},
         'async': false,
         'global': false,

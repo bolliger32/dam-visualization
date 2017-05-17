@@ -47,4 +47,32 @@ for(i in 1:nrow(dams)){
 dams <- subset(dams, !dams$key %in% dams_hydroelectric)
 
 ### SAVE AS .CSV
-write.csv(dams, file="../data/dams.csv",row.names = F)
+write.csv(dams, file="../docs/data/dams.csv",row.names = F)
+
+### Write to GeoJSON
+library(rgdal)
+dams$latitude <- as.character(dams$latitude)
+dams$longitude <- as.character(dams$longitude)
+dams$latitude <- as.numeric(dams$latitude)
+dams$longitude <- as.numeric(dams$longitude)
+
+dams <- SpatialPointsDataFrame(coords=dams[,c("longitude","latitude")],data=dams[,c(1,2,3,6:32)], proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
+plot(dams)
+
+
+writeOGR(dams, '../docs/data/dams.geojson','dams',driver='GeoJSON')
+
+
+### Save individual state files
+states <- unique(dams$State)
+write(states,'../docs/data/states.txt')
+
+for(i in 1:length(unique(dams$State))){
+  dams_state <- dams[dams$State==unique(dams$State)[i],]
+  dams_state$latitude <- as.character(dams_state$latitude)
+  dams_state$longitude <- as.character(dams_state$longitude)
+  dams_state$latitude <- as.numeric(dams_state$latitude)
+  dams_state$longitude <- as.numeric(dams_state$longitude)
+  dams_state <- SpatialPointsDataFrame(coords=dams_state[,c("longitude","latitude")],data=dams_state[,c(1,2,3,6:32)], proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
+  writeOGR(dams_state, paste('../data/dams_',unique(dams$State)[i],'.geojson',sep=""),paste('dams_',unique(dams$State)[i],sep=""),driver='GeoJSON')
+}
