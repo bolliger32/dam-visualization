@@ -1,0 +1,203 @@
+/* Reset */
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after, q:before, q:after {
+  content: '';
+  content: none;
+}
+
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+	text-align: center;
+    width: 100%;
+}
+
+td {
+    border: 3px solid #636363;
+    text-align: center;
+    padding: 3px;
+}
+
+th {
+	border: 3px solid #636363;
+	text-align: center;
+	padding:3px;
+}
+
+.leaflet-popup-content-wrapper {
+	border: 3px solid #636363;
+	padding:0px;
+	font-family: 'Droid Serif';
+    border-collapse: collapse;
+	text-align: center;
+}
+
+tr:nth-child(odd) {
+    background-color: #dddddd;
+}
+
+
+body {
+  -webkit-text-size-adjust: none;
+}
+
+/* Box Model */
+
+*, *:before, *:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#intro {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  overflow-x: hidden;
+  align-items: stretch;
+  min-height: 100vh;
+  position: relative;
+}
+
+@media only screen and (max-device-width : 800px) {
+  #intro {
+    flex-wrap: wrap;
+    flex-direction: column;
+  }
+}
+
+#intro .content {
+  padding: 2em;
+  margin: 0;
+  width: 20%;
+  flex-shrink: 1;
+  flex-grow: 1;
+}
+
+#intro .map {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  flex-shrink: 1;
+  flex-grow: 1;
+}
+
+.map-legend {
+  min-height: 12em;
+  padding:.75em;
+  font-size:.8em;
+  list-style-type: none;
+}
+
+.map-legend li {
+  margin-bottom: 0.7em;
+}
+
+.map-legend li.dams-layer {
+  display: flex;
+  align-items: center;
+}
+
+.dams-symbol {
+  background: #fdae6b;
+  border: 1px solid #e6550d;
+  height:12px;
+  width:12px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.legend {
+  padding-bottom: 2em;
+  padding-top: 0.5em;
+}
+
+.legend label,
+.legend span {
+  float:left;
+  height:15px;
+  width:20%;
+  text-align: right;
+  font-size:0.9em;
+}
+
+.dataviz {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.dataviz .chart-container {
+  width: 40%;
+  padding: 2em;
+  min-height: 20em;
+}
+
+.dataviz .content {
+  width: 60%;
+  padding: 2em;
+}
+
+.container {
+  padding: 2em;
+}
+
+.container.flex {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.container article {
+  flex-shrink: 1;
+  flex-grow: 1;
+  width: 30%;
+  padding: 1em;
+}
+
+footer {
+  text-align: center;
+  margin-bottom: 3em; 
+  font-size: 0.9em;
+}
+
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}

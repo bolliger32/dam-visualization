@@ -1,8 +1,0 @@
-{
-"type": "FeatureCollection",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-                                                                                
-"features": [
-{ "type": "Feature", "id": 15635, "properties": { "key": 17433, "Dam_Name": "FENA DAM", "NID_ID": "GU82301", "River": "FENA RIVER", "Owner_Name": "DOD USN", "Owner_Type": "Federal", "Dam_Type": "Earth", "Primary_Purpose": "Water Supply", "All_Purposes": "Water Supply", "Year_Completed": 1950, "Dam_Length": 1500.000000, "Dam_Height": null, "Structural_Height": 80.000000, "Hydraulic_Height": 135.000000, "NID_Height": 135.000000, "Max_Discharge": 8000.000000, "Max_Storage": 9500.000000, "Normal_Storage": 7500.000000, "NID_Storage": 9500.000000, "Surface_Area": null, "Drainage_Area": null, "Permitting_Authority": "N", "State_Reg_Dam": "N", "State_Reg_Agency": null, "Fed_Owner": "DOD USN", "Fed_Operation": "DOD USN", "Source_Agency": "DOD USN", "State": "GU", "Url_Address": null, "Submit_Date": "02\\27\\2013" }, "geometry": { "type": "Point", "coordinates": [ -144.7061, 13.3605 ] } }
-]
-}
