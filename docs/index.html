@@ -50,18 +50,33 @@
 
         <!-- Project description -->
         <div class="content">
-          <h1>Dams in the United States</h1>
+          <h1>Non-powered Dams in the United States</h1>
           <p>
-			  Zoom in, then click on one or more dams to see details. </br>
+			      Zoom in, then click on one or more dams to see details. </br>
           </p>
-		    <p>
-			  Click anywhere to clear dam comparison. </br>
+		      <p>
+			      Click anywhere to clear dam comparison. </br>
           </p>
+<!--
           <ul class="map-legend">
             <li class="dams-layer">
               <span class="dams-symbol"></span>Dam Locations
             </li>
           </ul>
+-->
+          <div id="stSelectDiv">
+            <div id="stSelectTblDiv">
+              <table id="statesTbl">
+                <tr>
+                  <th>State</th>
+                  <th>Include</th>
+                </tr>
+              </table>
+            </div>
+            <input type="button" id="selectAllStates" value="Select All">
+            <input type="button" id="clearStates" value="Clear All">
+            <input type="button" id="stButton" value="Load" onClick=loadStates>
+          </div>
         </div>
 
         <!-- Map panel -->

@@ -69,7 +69,7 @@ em, i {
 }
 
 p {
-  margin: 0 0 2rem 0;
+  margin: 0 0 .5rem 0;
 }
 
   p.major {
@@ -89,7 +89,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 
 h1 {
-  font-size: 3.5rem;
+  font-size: 2rem;
   line-height: 1.2;
 }
 
