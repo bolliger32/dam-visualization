@@ -11,7 +11,7 @@ library(dplyr)
 dams <- get_nid()
 dams_bu <- dams
 
-### SELECT COLUMNS OF INTEREST - THESE WILL BE NARROWED DOWN LATER
+### SELECT COLUMNS OF INTEREST
 dams <- dams %>%
   select(Dam_Name,NID_ID,Latitude,Longitude,River,Owner_Name,Owner_Type,Dam_Type,Primary_Purpose,All_Purposes,Year_Completed,Dam_Length,Dam_Height,Structural_Height,Hydraulic_Height,NID_Height,Max_Discharge,Max_Storage,Normal_Storage,NID_Storage,Surface_Area,Drainage_Area,Permitting_Authority,State_Reg_Dam,State_Reg_Agency, Fed_Owner, Fed_Operation, Source_Agency, State,Url_Address,Submit_Date)
 
@@ -43,8 +43,12 @@ for(i in 1:nrow(dams)){
   }
   
 }
-
 dams <- subset(dams, !dams$key %in% dams_hydroelectric)
+
+### DELETE DAMS THAT DON'T MEET SIZE REQUIREMENTS
+dams <- dams[dams$Hydraulic_Height>10 & dams$Hydraulic_Height<60,]
+summary(dams[is.na(dams$Hydraulic_Height),]$Structural_Height) #structural height isn't helpful at this point because the dams with NA Hydraulic Height also have NA structural height
+dams <- dams[dams$Drainage_Area > 2,]
 
 ### SAVE AS .CSV
 write.csv(dams, file="../docs/data/dams.csv",row.names = F)
