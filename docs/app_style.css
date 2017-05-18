@@ -201,3 +201,8 @@ footer {
     margin: 0 0 5px;
     color: #777;
 }
+
+#stSelectTblDiv {
+  max-height: 300px;
+  overflow: auto;
+}

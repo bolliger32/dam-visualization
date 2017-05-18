@@ -6,10 +6,10 @@
   //Initialize a new Leaflet map object
   //Pass an object of options to initialization function
   var map = L.map('map', {
-	center: [38, -120.5],
+	center: [39.8, -98.6],
     zoom: 4,
-    minZoom: 2,
-    maxZoom: 19,
+    minZoom: 4,
+    maxZoom: 18,
     attributionControl: true,
     touchZoom: false,
     scrollWheelZoom: false
@@ -86,32 +86,56 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
         'dataType': "json"});
     return filterJSON; })();
   
+var states;
+$.get('data/states.txt', function(data) {
+     var stateTbl = document.getElementById("statesTbl");  
+     states = data.split("\n");
+     states = states.slice(0,-1);
+     states = states.sort();
+     for (ix in states) {
+       var thisST = states[ix];
+       var row = stateTbl.insertRow(-1);
+       var cell1 = row.insertCell(0);
+       var cell2 = row.insertCell(1);
+       cell1.innerHTML = "<label for=select"+thisST+">"+thisST+"</label>"
+       cell2.innerHTML = "<input type='checkbox' class='stCheckbox' id=select"+thisST+" value="+thisST+" name="+thisST+">";
+     }
+     document.getElementById("selectCA").checked = true;
+  });
+  
+  // Create a new Leaflet layer control
+  var layerControl = L.control.layers(null, null, { position: 'topleft', }).addTo(map);
   // Use ajax call to get data. After data comes back apply styles and bind popup
   // If you're experienced with jQuery, you'll recognize we're making a GET 
   // request and expecting JSON in the response body. 
   // We're also passing in a callback function that takes the response JSON and adds it to the document.
-  function addDams(filterFunc) {
-    $.getJSON("data/dams_CA.geojson", function(data) {
-
+  function addDams(states,filterFunc) {
+    $.ajaxSetup({
+      async: false
+    });
+    dams_json = {}
+    for (ix in states) {
+      $.getJSON("data/dams_"+states[ix]+".geojson", function(data) {
+        if (ix == 0) dams_json = data;
+        else dams_json['features'] = dams_json['features'].concat(data['features']);
+      });
+    }
     // Create new L.geoJson layer with data recieved from geojson file
     // and set the damLocations variable to new L.geoJson layer
     if (typeof filterFunc === "undefined") {
-      damLocations = L.geoJson(data, {
+      damLocations = L.geoJson(dams_json, {
         pointToLayer: createMarker,
         onEachFeature: onEachFeature
       });
     } else {
-      damLocations = L.geoJson(data, {
+      damLocations = L.geoJson(dams_json, {
         pointToLayer: createMarker,
         onEachFeature: onEachFeature,
         filter: filterFunc
       });
-    }
-
-
+    };
+    
     // Add dam locations layer as an overlay to layer control
-    // Note: $.getJSON method is asynchronous. Although we intialize layerControl later in the code
-    // it should already exists by the time this code runs. 
     layerControl.addOverlay(damLocations, "Dam Locations");
 
     /********************************************************************************
@@ -124,17 +148,20 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
 
     // Add dam clusters to map
     clusteredMarkers.addTo(map);
-    });
-  }
-  addDams();
+  };
+  addDams(["CA"]);
+  var stButton = document.getElementById("stButton");
+  stButton.onclick = loadStates;
+  var selectAllSTButton = document.getElementById("selectAllStates")
+  selectAllSTButton.onclick = function () {$(".stCheckbox").prop('checked',true)};
+  var clearSTButton = document.getElementById("clearStates")
+  clearSTButton.onclick = function () {$(".stCheckbox").prop('checked',false)};
+  
 
 
   /********************************************************************************
     ADD LAYER CONTROL
   ********************************************************************************/
-
-  // Create a new Leaflet layer control
-  var layerControl = L.control.layers(null, null, { position: 'topleft', }).addTo(map);
 
   // Add basemap defined earlier to layer control
   layerControl.addBaseLayer(Esri_WorldImagery, "Imagery");
@@ -143,6 +170,18 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   layerControl.addBaseLayer(HydroNHD_WorldImagery, "Hydrography");
 
 
+  function loadStates() {
+    map.removeLayer(damLocations);
+    clusteredMarkers.clearLayers();
+    layerControl.removeLayer(damLocations);
+    layerControl.removeLayer(clusteredMarkers);
+    var statesToLoad = []
+    for (ix in states) {
+      var stateCheckbox = document.getElementById("select"+states[ix]);
+      if (stateCheckbox.checked) statesToLoad.push(states[ix]);
+    }
+    addDams(statesToLoad);
+  }
 
   function getFilterFunc(filters) {
     var num_filters = filters.childNodes.length;
@@ -293,8 +332,8 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
     filtersDiv.appendChild(newFilterDiv);
     var newFilter = filtersDiv.lastChild;
     var varSel = newFilter.firstChild;
-    for(index in filterJSON['types']) {
-      varSel.options[varSel.options.length] = new Option(index, index)
+    for(index in filterJSON['names']) {
+      varSel.options[varSel.options.length] = new Option(filterJSON['names'][index][1], filterJSON['names'][index][0])
     }
     varSel.onchange = function() {switchAvailValues(newFilter,varSel.value)};
   }
@@ -310,8 +349,8 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
     var filter0 = filters.firstChild;
     var varSel = filter0.firstChild;
     
-    for(index in filterJSON['types']) {
-      varSel.options[varSel.options.length] = new Option(index, index)
+    for(index in filterJSON['names']) {
+      varSel.options[varSel.options.length] = new Option(filterJSON['names'][index][1], filterJSON['names'][index][0])
     }
     varSel.onchange = function() {switchAvailValues(filter0,varSel.value)};
     addFilterButton.onclick = function() {addFilter(filters)};
