@@ -1,15 +1,14 @@
 import json
 import pandas as pd
+import operator
 
 with open('../docs/data/dams.geojson') as f:
     in_json = json.load(f)
     in_ftrs = in_json['features']
 
-    
 ftr1 = in_ftrs[0]
 prop1 = ftr1['properties']
 var_names = prop1.keys()
-
 
 types = {}
 vals = {}
@@ -52,12 +51,34 @@ types['River'] = 'open_text'
 del types['Submit_Date']
 del vals['Submit_Date']
 
+# Field Names
+names = {i:i.replace('_',' ') for i in types.keys()}
+names['Fed_Operation'] = "Federal Agency Operating"
+names['All_Purposes'] = 'Dam Purpose (all)'
+names['Primary_Purpose'] = 'Dam Purpose (primary)'
+names['Fed_Owner'] = 'Federal Agency Owning'
+names['Max_Storage'] = 'Max Storage (acre-feet)'
+names['Normal_Storage'] = 'Normal Storage (acre-feet)'
+names['Hydraulic_Height'] = 'Hydraulic Height (feet)'
+names['Structural_Height'] = 'Structural Height (feet)'
+names['Dam_Height'] = 'Dam Height (feet)'
+names['NID_Height'] = 'Max Height (feet)'
+names['Dam_Length'] = 'Dam Length (feet)'
+names['Source_Agency'] = 'Data Source'
+names['State_Reg_Agency'] = 'State Regulatory Agency'
+names['State_Reg_Dam'] = 'State Regulation'
+names['Surface_Area'] = 'Surface Area (acres)'
+names = sorted(names.items(), key=operator.itemgetter(1))
+
+
 for v in vals:
     vals[v] = sorted(vals[v])
 out_json = {
     'types':types,
-    'vals':vals
+    'vals':vals,
+    'names':names
 }
 
-with open('../dam_viz/assets/data/filterText.json','w') as f:
+with open('../docs/data/filterText.json','w') as f:
     json.dump(out_json,f)
+
