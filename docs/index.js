@@ -86,7 +86,7 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
         'dataType': "json"});
     return filterJSON; })();
   
-var states;
+var statesToLoad = ['CA'];
 $.get('data/states.txt', function(data) {
      var stateTbl = document.getElementById("statesTbl");  
      states = data.split("\n");
@@ -171,11 +171,11 @@ $.get('data/states.txt', function(data) {
 
 
   function loadStates() {
+    statesToLoad = [];
     map.removeLayer(damLocations);
     clusteredMarkers.clearLayers();
     layerControl.removeLayer(damLocations);
     layerControl.removeLayer(clusteredMarkers);
-    var statesToLoad = []
     for (ix in states) {
       var stateCheckbox = document.getElementById("select"+states[ix]);
       if (stateCheckbox.checked) statesToLoad.push(states[ix]);
@@ -281,7 +281,7 @@ $.get('data/states.txt', function(data) {
       addDams();
     } else {
       var filterFunc = getFilterFunc(filters);
-      addDams(filterFunc);
+      addDams(statesToLoad,filterFunc);
     }
   }
   
