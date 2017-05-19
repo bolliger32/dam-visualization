@@ -46,12 +46,14 @@ for(i in 1:nrow(dams)){
 dams <- subset(dams, !dams$key %in% dams_hydroelectric)
 
 ### DELETE DAMS THAT DON'T MEET SIZE REQUIREMENTS
-dams <- dams[dams$Hydraulic_Height>10 & dams$Hydraulic_Height<60,]
-summary(dams[is.na(dams$Hydraulic_Height),]$Structural_Height) #structural height isn't helpful at this point because the dams with NA Hydraulic Height also have NA structural height
-dams <- dams[dams$Drainage_Area > 2,]
+dams_subset <- subset(dams, dams$Hydraulic_Height > 10 | is.na(dams$Hydraulic_Height))
+dams_subset <- subset(dams_subset, dams_subset$Hydraulic_Height < 60 | is.na(dams_subset$Hydraulic_Height))
+dams_subset <- subset(dams_subset, dams_subset$NID_Height < 100)
+dams_subset <- subset(dams_subset, dams_subset$Drainage_Area >2)
 
 ### SAVE AS .CSV
 write.csv(dams, file="../docs/data/dams.csv",row.names = F)
+write.csv(dams_subset, file="../docs/data/dams_subset.csv",row.names = F)
 
 ### Write to GeoJSON
 library(rgdal)
@@ -59,18 +61,21 @@ dams$latitude <- as.character(dams$latitude)
 dams$longitude <- as.character(dams$longitude)
 dams$latitude <- as.numeric(dams$latitude)
 dams$longitude <- as.numeric(dams$longitude)
+dams_subset$latitude <- as.character(dams_subset$latitude)
+dams_subset$longitude <- as.character(dams_subset$longitude)
+dams_subset$latitude <- as.numeric(dams_subset$latitude)
+dams_subset$longitude <- as.numeric(dams_subset$longitude)
 
-dams <- SpatialPointsDataFrame(coords=dams[,c("longitude","latitude")],data=dams[,c(1,2,3,6:32)], proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
-plot(dams)
+dams_spdf <- SpatialPointsDataFrame(coords=dams[,c("longitude","latitude")],data=dams[,c(1,2,3,6:32)], proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
+dams_subset_spdf <- SpatialPointsDataFrame(coords=dams_subset[,c("longitude","latitude")],data=dams_subset[,c(1,2,3,6:32)], proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
 
+writeOGR(dams_spdf, '../docs/data/dams.geojson','dams',driver='GeoJSON')
+writeOGR(dams_subset_spdf, '../docs/data/dams.geojson','dams',driver='GeoJSON')
 
-writeOGR(dams, '../docs/data/dams.geojson','dams',driver='GeoJSON')
-
-
-### Save individual state files
+### SAVE INDIVIDUAL STATE FILES
 states <- unique(dams$State)
 write(states,'../docs/data/states.txt')
-
+i <- 1
 for(i in 1:length(unique(dams$State))){
   dams_state <- dams[dams$State==unique(dams$State)[i],]
   dams_state$latitude <- as.character(dams_state$latitude)
@@ -78,5 +83,16 @@ for(i in 1:length(unique(dams$State))){
   dams_state$latitude <- as.numeric(dams_state$latitude)
   dams_state$longitude <- as.numeric(dams_state$longitude)
   dams_state <- SpatialPointsDataFrame(coords=dams_state[,c("longitude","latitude")],data=dams_state[,c(1,2,3,6:32)], proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
-  writeOGR(dams_state, paste('../data/dams_',unique(dams$State)[i],'.geojson',sep=""),paste('dams_',unique(dams$State)[i],sep=""),driver='GeoJSON')
+  writeOGR(dams_state, paste('../docs/data/dams_',unique(dams$State)[i],'.geojson',sep=""),paste('dams_',unique(dams$State)[i],sep=""),driver='GeoJSON',overwrite_layer = T)
+}
+
+### REPEAT FOR SUBSET
+for(i in 1:length(unique(dams_subset$State))){
+  dams_subset_state <- dams_subset[dams_subset$State==unique(dams_subset$State)[i],]
+  dams_subset_state$latitude <- as.character(dams_subset_state$latitude)
+  dams_subset_state$longitude <- as.character(dams_subset_state$longitude)
+  dams_subset_state$latitude <- as.numeric(dams_subset_state$latitude)
+  dams_subset_state$longitude <- as.numeric(dams_subset_state$longitude)
+  dams_subset_state <- SpatialPointsDataFrame(coords=dams_subset_state[,c("longitude","latitude")],data=dams_subset_state[,c(1,2,3,6:32)], proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
+  writeOGR(dams_subset_state, paste('../docs/data/dams_subset_',unique(dams_subset$State)[i],'.geojson',sep=""),paste('dams_subset_',unique(dams_subset$State)[i],sep=""),driver='GeoJSON')
 }
