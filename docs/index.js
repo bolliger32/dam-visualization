@@ -1,4 +1,9 @@
 (function(){
+  var subset = document.getElementById("suffixSelect").checked;
+  
+  if (subset) var suffix = '_subset';
+  else var suffix = '';
+  
   /********************************************************************************
     INITIALIZE MAP
   ********************************************************************************/
@@ -79,15 +84,15 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   var filterJSON = (function () {
     var filterJSON = null;
     $.ajax({
-        'url':"data/filterText.json",
+        'url':"data/filterText"+suffix+".json",
         'success': function(data) {filterJSON=data;},
         'async': false,
         'global': false,
         'dataType': "json"});
     return filterJSON; })();
   
-var statesToLoad = ['CA'];
-$.get('data/states.txt', function(data) {
+var states, statesToLoad;
+$.get('data/states'+suffix+'.txt', function(data) {
      var stateTbl = document.getElementById("statesTbl");  
      states = data.split("\n");
      states = states.slice(0,-1);
@@ -100,7 +105,9 @@ $.get('data/states.txt', function(data) {
        cell1.innerHTML = "<label for=select"+thisST+">"+thisST+"</label>"
        cell2.innerHTML = "<input type='checkbox' class='stCheckbox' id=select"+thisST+" value="+thisST+" name="+thisST+">";
      }
-     document.getElementById("selectCA").checked = true;
+     $(".stCheckbox").prop('checked',true);
+     statesToLoad = states;
+     addDams(statesToLoad);
   });
   
   // Create a new Leaflet layer control
@@ -113,15 +120,18 @@ $.get('data/states.txt', function(data) {
     $.ajaxSetup({
       async: false
     });
+    
     dams_json = {}
     for (ix in states) {
-      $.getJSON("data/dams_subset_"+states[ix]+".geojson", function(data) {
+      $.getJSON("data/dams"+suffix+"_"+states[ix]+".geojson", function(data) {
         if (ix == 0) dams_json = data;
         else dams_json['features'] = dams_json['features'].concat(data['features']);
       });
-    }
-    // Create new L.geoJson layer with data recieved from geojson file
-    // and set the damLocations variable to new L.geoJson layer
+    };
+    filterDams(filterFunc);
+  };
+    
+  function filterDams(filterFunc) {
     if (typeof filterFunc === "undefined") {
       damLocations = L.geoJson(dams_json, {
         pointToLayer: createMarker,
@@ -134,7 +144,7 @@ $.get('data/states.txt', function(data) {
         filter: filterFunc
       });
     };
-    
+
     // Add dam locations layer as an overlay to layer control
     layerControl.addOverlay(damLocations, "Dam Locations");
 
@@ -149,7 +159,7 @@ $.get('data/states.txt', function(data) {
     // Add dam clusters to map
     clusteredMarkers.addTo(map);
   };
-  addDams(["CA"]);
+  
   var stButton = document.getElementById("stButton");
   stButton.onclick = loadStates;
   var selectAllSTButton = document.getElementById("selectAllStates")
@@ -278,10 +288,10 @@ $.get('data/states.txt', function(data) {
     layerControl.removeLayer(damLocations);
     layerControl.removeLayer(clusteredMarkers);
     if (filters == "reset") {
-      addDams();
+      filterDams();
     } else {
       var filterFunc = getFilterFunc(filters);
-      addDams(statesToLoad,filterFunc);
+      filterDams(filterFunc);
     }
   }
   

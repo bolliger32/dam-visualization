@@ -43,13 +43,13 @@ for(i in 1:nrow(dams)){
   }
   
 }
-dams <- subset(dams, !dams$key %in% dams_hydroelectric)
+dams_subset <- subset(dams, !dams$key %in% dams_hydroelectric)
 
 ### DELETE DAMS THAT DON'T MEET SIZE REQUIREMENTS
-dams_subset <- subset(dams, dams$Hydraulic_Height > 10 | is.na(dams$Hydraulic_Height))
-dams_subset <- subset(dams_subset, dams_subset$Hydraulic_Height < 60 | is.na(dams_subset$Hydraulic_Height))
-dams_subset <- subset(dams_subset, dams_subset$NID_Height < 100)
-dams_subset <- subset(dams_subset, dams_subset$Drainage_Area >2)
+dams_subset <- subset(dams, dams$Hydraulic_Height >= 10 | is.na(dams$Hydraulic_Height))
+dams_subset <- subset(dams_subset, dams_subset$Hydraulic_Height <= 60 | is.na(dams_subset$Hydraulic_Height))
+dams_subset <- subset(dams_subset, dams_subset$NID_Height <= 100 | is.na(dams_subset$NID_Height))
+dams_subset <- subset(dams_subset, dams_subset$Drainage_Area >=2)
 
 ### SAVE AS .CSV
 write.csv(dams, file="../docs/data/dams.csv",row.names = F)
@@ -87,6 +87,8 @@ for(i in 1:length(unique(dams$State))){
 }
 
 ### REPEAT FOR SUBSET
+states <- unique(dams_subset$State)
+write(states,'../docs/data/states_subset.txt')
 for(i in 1:length(unique(dams_subset$State))){
   dams_subset_state <- dams_subset[dams_subset$State==unique(dams_subset$State)[i],]
   dams_subset_state$latitude <- as.character(dams_subset_state$latitude)
