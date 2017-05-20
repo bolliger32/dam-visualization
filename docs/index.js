@@ -115,7 +115,7 @@ $.get('data/states.txt', function(data) {
     });
     dams_json = {}
     for (ix in states) {
-      $.getJSON("data/dams_"+states[ix]+".geojson", function(data) {
+      $.getJSON("data/dams_subset_"+states[ix]+".geojson", function(data) {
         if (ix == 0) dams_json = data;
         else dams_json['features'] = dams_json['features'].concat(data['features']);
       });
