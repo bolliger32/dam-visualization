@@ -89,3 +89,5 @@ ENV/
 .ropeproject
 
 scripts/\.Rhistory
+
+scripts/%1
