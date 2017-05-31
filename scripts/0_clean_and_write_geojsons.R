@@ -51,6 +51,9 @@ dams_subset <- subset(dams_subset, dams_subset$Hydraulic_Height <= 60 | is.na(da
 dams_subset <- subset(dams_subset, dams_subset$NID_Height <= 100 | is.na(dams_subset$NID_Height))
 dams_subset <- subset(dams_subset, dams_subset$Drainage_Area >=2)
 
+dams_subsettest <- subset(dams_subset, dams_subset$Drainage_Area >=2 | is.na(dams_subset$Drainage_Area))
+summary(dams_subset$Drainage_Area) ## dams with NA drainage area are significant
+
 ### SAVE AS .CSV
 write.csv(dams, file="../docs/data/dams.csv",row.names = F)
 write.csv(dams_subset, file="../docs/data/dams_subset.csv",row.names = F)
@@ -98,3 +101,13 @@ for(i in 1:length(unique(dams_subset$State))){
   dams_subset_state <- SpatialPointsDataFrame(coords=dams_subset_state[,c("longitude","latitude")],data=dams_subset_state[,c(1,2,3,6:32)], proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
   writeOGR(dams_subset_state, paste('../docs/data/dams_subset_',unique(dams_subset$State)[i],'.geojson',sep=""),paste('dams_subset_',unique(dams_subset$State)[i],sep=""),driver='GeoJSON')
 }
+
+### Test: Check sum of dams across state files
+# totaln <- 0
+# for(i in 1:length(unique(dams_subset$State))){
+#   state_file <- (paste('../docs/data/dams_subset_',unique(dams_subset$State)[i],'.geojson',sep=""))
+#   state_file <- readOGR(state_file)
+#   n <- nrow(state_file)
+#   totaln <- totaln+n
+# }
+# totaln
