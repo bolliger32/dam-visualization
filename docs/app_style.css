@@ -205,6 +205,8 @@ footer {
 #stSelectTblDiv {
   max-height: 100%;
   overflow: auto;
+  font: Arial, Helvetica, sans-serif;
+  font-size: .8em;
 }
 
 varSel {
