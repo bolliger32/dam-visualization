@@ -49,9 +49,7 @@ dams_subset <- subset(dams, !dams$key %in% dams_hydroelectric)
 dams_subset <- subset(dams, dams$Hydraulic_Height >= 10 | is.na(dams$Hydraulic_Height))
 dams_subset <- subset(dams_subset, dams_subset$Hydraulic_Height <= 60 | is.na(dams_subset$Hydraulic_Height))
 dams_subset <- subset(dams_subset, dams_subset$NID_Height <= 100 | is.na(dams_subset$NID_Height))
-dams_subset <- subset(dams_subset, dams_subset$Drainage_Area >=2)
-
-dams_subsettest <- subset(dams_subset, dams_subset$Drainage_Area >=2 | is.na(dams_subset$Drainage_Area))
+dams_subset <- subset(dams_subset, dams_subset$Drainage_Area >=2 | is.na(dams_subset$Drainage_Area))
 summary(dams_subset$Drainage_Area) ## dams with NA drainage area are significant
 
 ### SAVE AS .CSV
@@ -102,12 +100,14 @@ for(i in 1:length(unique(dams_subset$State))){
   writeOGR(dams_subset_state, paste('../docs/data/dams_subset_',unique(dams_subset$State)[i],'.geojson',sep=""),paste('dams_subset_',unique(dams_subset$State)[i],sep=""),driver='GeoJSON')
 }
 
-### Test: Check sum of dams across state files
-# totaln <- 0
-# for(i in 1:length(unique(dams_subset$State))){
-#   state_file <- (paste('../docs/data/dams_subset_',unique(dams_subset$State)[i],'.geojson',sep=""))
-#   state_file <- readOGR(state_file)
-#   n <- nrow(state_file)
-#   totaln <- totaln+n
-# }
-# totaln
+## Test: Check sum of dams across state files
+totaln <- 0
+for(i in 1:length(unique(dams_subset$State))){
+  state_file <- (paste('../docs/data/dams_subset_',unique(dams_subset$State)[i],'.geojson',sep=""))
+  state_file <- readOGR(state_file)
+  n <- nrow(state_file)
+  totaln <- totaln+n
+}
+
+# The below should be TRUE
+totaln == nrow(dams_subset)

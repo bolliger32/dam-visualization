@@ -9,6 +9,7 @@ GA
 HI
 IA
 IN
+IL
 ID
 KS
 MA
@@ -19,16 +20,16 @@ MD
 MO
 MN
 MT
-ND
 NC
+ND
 NE
 NH
 NY
 NJ
 OH
 RI
-SC
 PA
+SC
 OR
 TX
 SD
@@ -46,7 +47,6 @@ WY
 MS
 NV
 OK
-AK
-IL
 PR
+AK
 GU
