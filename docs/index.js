@@ -334,7 +334,7 @@ $.get('data/states'+suffix+'.txt', function(data) {
     var numFilters = filtersDiv.childNodes.length;
     var newFilterDiv = document.createElement("div");
     newFilterDiv.id = "filter"+numFilters.toString();
-    newFilterDiv.style.maxHeight = "200px";
+    newFilterDiv.style.maxHeight = "1000px";
     newFilterDiv.style.overflow = "auto";
     newFilterDiv.innerHTML = '<select id="'+newFilterDiv.id+'varSel"><option value="selectVar'+numFilters.toString()+'">Select Variable:</option></select>'
     filtersDiv.appendChild(newFilterDiv);
@@ -344,6 +344,7 @@ $.get('data/states'+suffix+'.txt', function(data) {
       varSel.options[varSel.options.length] = new Option(filterJSON['names'][index][1], filterJSON['names'][index][0])
     }
     varSel.onchange = function() {switchAvailValues(newFilter,varSel.value)};
+	console.log(filtersDiv);
   }
   var filterBar = L.control({position: 'topright'});
 	filterBar.onAdd = function () {
@@ -361,13 +362,11 @@ $.get('data/states'+suffix+'.txt', function(data) {
       varSel.options[varSel.options.length] = new Option(filterJSON['names'][index][1], filterJSON['names'][index][0])
     }
     varSel.onchange = function() {switchAvailValues(filter0,varSel.value)};
+	console.log(varSel);
     addFilterButton.onclick = function() {addFilter(filters)};
     applyFilterButton.onclick = function() {applyFilter(filters)};
     clearFilterButton.onclick = function() {applyFilter("reset"); removeFilters(filters);};
-      
-//    div.innerHTML = '<select><option value="reset">Dam Type</option><option value="Rockfill">Rockfill</option><option value="Earth">Earth</option><option value="Multi-Arch">Multi-Arch</option><option value="Timber Crib">Timber Crib</option><option value="RCC">RCC</option><option value="Masonry">Masonry</option><option value="Stone">Stone</option><option value="Concrete">Concrete</option><option value="Gravity">Gravity</option><option value="Arch">Arch</option><option value="Buttress">Buttress</option><option value="Other">Other</option></select>';
-//		selector.onchange = function () {applyFilter(selector.value)};
-//    selector.onmousedown = selector.ondblclick = L.DomEvent.stopPropagation;
+
 		return div;
 	};
 	map.addControl(filterBar);
@@ -405,8 +404,10 @@ map.on('zoomend', function(){
 	
 	var table = document.createElement('table');
 	var theader1 = document.createElement('th');
+	var theader1a = document.createElement('th');
 	var theader2 = document.createElement('th');
 	var theader3 = document.createElement('th');
+	var theader3a = document.createElement('th');
 	var theader4 = document.createElement('th');
 	var theader5 = document.createElement('th');
 	var theader6 = document.createElement('th');
@@ -416,18 +417,22 @@ map.on('zoomend', function(){
 	var theader10 = document.createElement('th');
 	var trH = document.createElement('tr');
 	var headertext1 = document.createTextNode('Dam Name');
+	var headertext1a = document.createTextNode('NID ID');
 	var headertext2 = document.createTextNode('Type');
-	var headertext3 = document.createTextNode('Height (ft)');
+	var headertext3 = document.createTextNode('Hydraulic Height (ft)');
+	var headertext3a = document.createTextNode('Structural Height (ft)');
 	var headertext4 = document.createTextNode('River');
 	var headertext5 = document.createTextNode('Primary Purpose');
 	var headertext6 = document.createTextNode('Max Discharge');
-	var headertext7 = document.createTextNode('Storage');
+	var headertext7 = document.createTextNode('Storage (ac-ft)');
 	var headertext8 = document.createTextNode('Drainage Area');
 	var headertext9 = document.createTextNode('Reg Agency');
 	var headertext10 = document.createTextNode('Owner');
 	theader1.appendChild(headertext1);
+	theader1a.appendChild(headertext1a);
 	theader2.appendChild(headertext2);
 	theader3.appendChild(headertext3);
+	theader3a.appendChild(headertext3a);
 	theader4.appendChild(headertext4);
 	theader5.appendChild(headertext5);
 	theader6.appendChild(headertext6);
@@ -436,8 +441,10 @@ map.on('zoomend', function(){
 	theader9.appendChild(headertext9);
 	theader10.appendChild(headertext10);
 	trH.appendChild(theader1);
+	trH.appendChild(theader1a);
 	trH.appendChild(theader2);
 	trH.appendChild(theader3);
+	trH.appendChild(theader3a);
 	trH.appendChild(theader4);
 	trH.appendChild(theader5);
 	trH.appendChild(theader6);
@@ -453,11 +460,17 @@ map.on('zoomend', function(){
 		var td1 = document.createElement('td');
 		var text1 = document.createTextNode(props ? props.Dam_Name : '');
 		
+		var td1a = document.createElement('td');
+		var text1a = document.createTextNode(props ? ' ' + props.NID_ID + ' ': '');
+		
 		var td2 = document.createElement('td');
 		var text2 = document.createTextNode(props ? ' ' + props.Dam_Type + ' ': '');
 		
 		var td3 = document.createElement('td');
 		var text3 = document.createTextNode(props ? ' ' + props.Hydraulic_Height + ' ' : '');
+		
+		var td3a = document.createElement('td');
+		var text3a = document.createTextNode(props ? ' ' + props.Structural_Height + ' ' : '');
 		
 		var td4 = document.createElement('td');
 		var text4 = document.createTextNode(props ? ' ' + props.River + ' ' : '');
@@ -479,15 +492,14 @@ map.on('zoomend', function(){
 		
 		var td10 = document.createElement('td');
 		var text10 = document.createTextNode(props ? ' ' + props.Owner_Name + ' ' : '');
-		
+	
 		td1.appendChild(text1);
 		tr1.appendChild(td1);
 		table.appendChild(tr1);	
-		
+		td1a.appendChild(text1a);
 		td2.appendChild(text2);
-		tr1.appendChild(td2);
-
 		td3.appendChild(text3);
+		td3a.appendChild(text3a);
 		td4.appendChild(text4);
 		td5.appendChild(text5);
 		td6.appendChild(text6);
@@ -495,7 +507,10 @@ map.on('zoomend', function(){
 		td8.appendChild(text8);
 		td9.appendChild(text9);
 		td10.appendChild(text10);
+		tr1.appendChild(td1a);
+		tr1.appendChild(td2);
 		tr1.appendChild(td3);
+		tr1.appendChild(td3a);
 		tr1.appendChild(td4);
 		tr1.appendChild(td5);
 		tr1.appendChild(td6);
@@ -505,7 +520,7 @@ map.on('zoomend', function(){
 		tr1.appendChild(td10);
 
 		this._div.appendChild(table);
-		
+		console.log(table);
 
 	};
 
