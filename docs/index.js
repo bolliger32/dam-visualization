@@ -91,7 +91,7 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
         'dataType': "json"});
     return filterJSON; })();
   
-var states, statesToLoad;
+var states;
 $.get('data/states'+suffix+'.txt', function(data) {
      var stateTbl = document.getElementById("statesTbl");  
      states = data.split("\n");
@@ -105,9 +105,7 @@ $.get('data/states'+suffix+'.txt', function(data) {
        cell1.innerHTML = "<label for=select"+thisST+">"+thisST+"</label>"
        cell2.innerHTML = "<input type='checkbox' class='stCheckbox' id=select"+thisST+" value="+thisST+" name="+thisST+">";
      }
-     $(".stCheckbox").prop('checked',true);
-     statesToLoad = states;
-     addDams(statesToLoad);
+     document.getElementById("selectCA").checked = true;
   });
   
   // Create a new Leaflet layer control
@@ -159,7 +157,7 @@ $.get('data/states'+suffix+'.txt', function(data) {
     // Add dam clusters to map
     clusteredMarkers.addTo(map);
   };
-  
+  addDams(["CA"]);
   var stButton = document.getElementById("stButton");
   stButton.onclick = loadStates;
   var selectAllSTButton = document.getElementById("selectAllStates")
