@@ -190,11 +190,11 @@ footer {
 }
 
 .info {
-    padding: 6px 8px;
+    padding: 2px 2px;
     font: 14px/16px Arial, Helvetica, sans-serif;
     background: white;
     background: rgba(255,255,255,0.8);
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
     border-radius: 5px;
 }
 .info h4 {
@@ -203,6 +203,10 @@ footer {
 }
 
 #stSelectTblDiv {
-  max-height: 200px;
+  max-height: 600px;
   overflow: auto;
+}
+
+varSel {
+	padding: 10em;
 }

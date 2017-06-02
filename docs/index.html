@@ -50,17 +50,12 @@
 
         <!-- Project description -->
         <div class="content">
-          <h1>Non-powered Dams in the United States</h1>
-
-          <p>
-			      Zoom in, then click on one or more dams to see details. </br>
-          </p>
-		      <p>
-			      Click anywhere to clear dam comparison. </br>
-          </p>
-		  		  <h4>
-			      Select states to display: </br>
-          </h4>
+          
+			<h2>Non-powered Dams in the United States</h2>
+          <h4 >
+			      Select state(s), zoom in, then click on one or more dams to see details. Click anywhere to clear dam comparison.
+				  <h4>
+				  <label for="suffixSelect" style="font-size:1rem;float:right;">Only visualize feasible non-powered Dams (see README for details)</label><input type='checkbox' id="suffixSelect" value="suffixSelect" name="suffixSelect" checked style="font-size:1rem;float:right;">
 
 <!--
           <ul class="map-legend">
@@ -69,8 +64,10 @@
             </li>
           </ul>
 -->
-          <div id="stSelectDiv">
+<div style="width: 100%; overflow: scroll;">
+          <div id="stSelectDiv" style="float: left; width: 20%">
             <div id="stSelectTblDiv">
+					  		 
               <table id="statesTbl">
                 <tr>
                   <th>State</th>
@@ -82,16 +79,17 @@
             <input type="button" id="clearStates" value="Clear All">
             <input type="button" id="stButton" value="Load" onClick=loadStates>
           </div>
-          <label for="suffixSelect" style="font-size:.75rem">Only visualize feasible non-powered Dams (see README for details)</label><input type='checkbox' id="suffixSelect" value="suffixSelect" name="suffixSelect" checked>
-        </div>
+          
+
 
         <!-- Map panel -->
-        <div class="map" id="map"></div>
-
+        <div class="map" id="map" style="width: 80%;float: right;">
+		</div>
+</div>
       </section>
 
       <footer>
-        <p><i>DS421 - UC Berkeley</i></p>
+        <p><i>Ian Bolliger, Carmen Tubbesing, Junpei Asai - DS421 - UC Berkeley</i></p>
       </footer>
     </main>
 
