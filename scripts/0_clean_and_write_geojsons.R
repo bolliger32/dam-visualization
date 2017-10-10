@@ -70,8 +70,8 @@ dams_subset$longitude <- as.numeric(dams_subset$longitude)
 dams_spdf <- SpatialPointsDataFrame(coords=dams[,c("longitude","latitude")],data=dams[,c(1,2,3,6:32)], proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
 dams_subset_spdf <- SpatialPointsDataFrame(coords=dams_subset[,c("longitude","latitude")],data=dams_subset[,c(1,2,3,6:32)], proj4string = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
 
-writeOGR(dams_spdf, '../docs/data/dams.geojson','dams',driver='GeoJSON')
-writeOGR(dams_subset_spdf, '../docs/data/dams.geojson','dams',driver='GeoJSON')
+writeOGR(dams_spdf, '../docs/data/dams.geojson','dams',driver='GeoJSON', overwrite_layer = T)
+writeOGR(dams_subset_spdf, '../docs/data/dams.geojson','dams',driver='GeoJSON', overwrite_layer = T)
 
 ### SAVE INDIVIDUAL STATE FILES
 states <- unique(dams$State)
@@ -103,7 +103,15 @@ for(i in 1:length(unique(dams_subset$State))){
 ## Test: Check sum of dams across state files
 totaln <- 0
 for(i in 1:length(unique(dams_subset$State))){
-  state_file <- (paste('../docs/data/dams_subset_',unique(dams_subset$State)[i],'.geojson',sep=""))
+  state_subset_file <- (paste('../docs/data/dams_subset_',unique(dams_subset$State)[i],'.geojson',sep=""))
+  state_subset_file <- readOGR(state_subset_file)
+  n <- nrow(state_subset_file)
+  totaln <- totaln+n
+}
+
+totaln <- 0
+for(i in 1:length(unique(dams_subset$State))){
+  state_file <- (paste('../docs/data/dams_',unique(dams$State)[i],'.geojson',sep=""))
   state_file <- readOGR(state_file)
   n <- nrow(state_file)
   totaln <- totaln+n
