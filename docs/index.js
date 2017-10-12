@@ -1,8 +1,11 @@
 (function(){
-  var subset = document.getElementById("suffixSelect").checked;
-  
-  if (subset) var suffix = '_subset';
-  else var suffix = '';
+  var suffix = '';
+  function setSuffix(){
+    var subset = document.getElementById("suffixSelect").checked;
+    if (subset) suffix = '_subset';
+    else suffix = '';
+  }
+  setSuffix();
   
   /********************************************************************************
     INITIALIZE MAP
@@ -81,7 +84,7 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
   }
 
   // Get variables and values JSON for use later on in filter creation
-  var filterJSON = (function () {
+  function loadFilterVals() {
     var filterJSON = null;
     $.ajax({
         'url':"data/filterText"+suffix+".json",
@@ -89,7 +92,9 @@ var HydroNHD_WorldImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/
         'async': false,
         'global': false,
         'dataType': "json"});
-    return filterJSON; })();
+    return filterJSON;
+  }
+  var filterJSON = loadFilterVals();
   
 var states;
 $.get('data/states'+suffix+'.txt', function(data) {
@@ -119,7 +124,9 @@ $.get('data/states'+suffix+'.txt', function(data) {
       async: false
     });
     
-    dams_json = {}
+    dams_json = {};
+    setSuffix();
+    filterJSON = loadFilterVals();
     for (ix in states) {
       $.getJSON("data/dams"+suffix+"_"+states[ix]+".geojson", function(data) {
         if (ix == 0) dams_json = data;
